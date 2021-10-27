@@ -38,4 +38,3 @@ if __name__ == "__main__":
         exit(1)
     test_theory()
     file_checks(sys.argv[1])
-oof

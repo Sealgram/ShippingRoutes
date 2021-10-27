@@ -5,7 +5,24 @@ from bauhaus.utils import count_solutions, likelihood
 # Encoding that will store all of your constraints
 E = Encoding()
 
-# To create propositions, create classes for them first, annotated with "@proposition" and the Encoding
+
+####################################
+#
+#   Propositions
+#
+####################################
+
+# Proposition to initialize the land nodes
+
+# Proposition to initialize the water nodes
+
+# Proposition to initialize the ship 
+
+# Proposition to initialize what kind of cargo is on the ship
+
+# Proposition to initialize the port nodes
+
+# Proposition to initialize the wildcard nodes
 @proposition(E)
 class BasicPropositions:
 
@@ -16,32 +33,27 @@ class BasicPropositions:
         return f"A.{self.data}"
 
 
-# Different classes for propositions are useful because this allows for more dynamic constraint creation
-# for propositions within that class. For example, you can enforce that "at least one" of the propositions
-# that are instances of this class must be true by using a @constraint decorator.
-# other options include: at most one, exactly one, at most k, and implies all.
-# For a complete module reference, see https://bauhaus.readthedocs.io/en/latest/bauhaus.html
-@constraint.at_least_one(E)
-@proposition(E)
-class FancyPropositions:
+####################################
+#
+#   Constraints
+#
+####################################
 
-    def __init__(self, data):
-        self.data = data
+# Port must be on a land node that is adjacent to at least one water node
 
-    def __repr__(self):
-        return f"A.{self.data}"
+# The ship cannot touch a land node unless it is a port node
 
-# Call your variables whatever you want
-a = BasicPropositions("a")
-b = BasicPropositions("b")   
-c = BasicPropositions("c")
-d = BasicPropositions("d")
-e = BasicPropositions("e")
-# At least one of these will be true
-x = FancyPropositions("x")
-y = FancyPropositions("y")
-z = FancyPropositions("z")
+# A water node cannot also be a land node
 
+# If a ship is at a port and has the cargo the port needs, the ship will take on the cargo the port has, drop the cargo the port
+# needs, and the port's two cargo types will be set to null
+
+# The ship can only move to one of the four adjacent nodes to the one it is currently on
+
+# There are 9 ports to be randomly placed on the map, and they cannot be within two nodes of each other
+
+
+####################################
 
 # Build an example full theory for your setting and return it.
 #
@@ -49,17 +61,8 @@ z = FancyPropositions("z")
 #  This restriction is fairly minimal, and if there is any concern, reach out to the teaching staff to clarify
 #  what the expectations are.
 def example_theory():
-    # Add custom constraints by creating formulas with the variables you created. 
-    E.add_constraint((a | b) & ~x)
-    # Implication
-    E.add_constraint(y >> z)
-    # Negate a formula
-    E.add_constraint((x & y).negate())
-    # You can also add more customized "fancy" constraints. Use case: you don't want to enforce "exactly one"
-    # for every instance of BasicPropositions, but you want to enforce it for a, b, and c.:
-    constraint.add_exactly_one(E, a, b, c)
-
-    return E
+    T = E.compile()
+    return T
 
 
 if __name__ == "__main__":

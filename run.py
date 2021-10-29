@@ -12,25 +12,176 @@ E = Encoding()
 #
 ####################################
 
-# Proposition to initialize the land nodes
+# Proposition to initialize the land nodes 
+
+@proposition(E)
+class Land:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"Land{ self.x, self.y}"
+
+#x land locations for yth row
+
+l_y0 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+l_y1 = [0,9,10,11,12,13,21]
+l_y2 = [0,2,3,4,5,10,11,12,21]
+l_y3 = [0,2,3,4,12,15,16,17,18,21]
+l_y4 = [0,2,3,4,5,8,9,10,15,16,17,18,21]
+l_y5 = [0,4,5,10,18,21]
+l_y6 = [0,13,14,15,16,21]
+l_y7 = [0,13,14,15,21]
+l_y8 = [0,3,4,8,9,13,14,15,16,21]
+l_y9 = [0,7,8,9,10,14,15,16,17,21]
+l_y10 = [0,8,9,16,20,21]
+l_y11 = [0,19,20,21]
+l_y12 = [0,3,4,5,6,7,8,18,19,20,21]
+l_y13 = [0,2,3,4,5,6,7,8,9,19,20,21]
+l_y14 = [0,3,4,5,6,7,8,14,15,20,21]
+l_y15 = [0,2,3,13,14,15,16,17,21]
+l_y16 = [0,2,3,10,11,12,13,14,15,16,17,21]
+l_y17 = [0,3,4,10,11,12,13,14,15,16,21]
+l_y18 = [0,4,10,11,12,13,14,15,21]
+l_y19 = [0,21]
+l_y20 = [0,21]
+l_y21 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+
+l_yall = [
+    l_y0,l_y1,l_y2,l_y3,l_y4,l_y5,l_y6,l_y7,l_y8,l_y9,
+    l_y10,l_y11,l_y12,l_y13,l_y14,l_y15,l_y16,l_y17,l_y18,l_y19,
+    l_y20,l_y21
+]
+
+land = []
+
+# initialize all land on map 
+for y in range(len(l_yall)):
+    for x in range(len(l_yall[y])):
+        prop = Land(l_yall[y][x], y)
+        land.append(prop)
+
+pprint.pprint(land)
 
 # Proposition to initialize the water nodes
 
+@proposition(E)
+class Water:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"Water{ self.x, self.y}"
+
+#x water locations for yth row
+w_y0 = []
+w_y1 = [1,2,3,4,5,6,7,8,14,15,16,17,18,19,20]
+w_y2 = [1,6,7,8,9,13,14,15,16,17,18,19,20]
+w_y3 = [1,5,6,7,8,9,10,11,13,14,19,20]
+w_y4 = [1,6,7,11,12,13,14,19,20]
+w_y5 = [1,2,3,6,7,8,9,11,12,13,14,15,16,17,19,20]
+w_y6 = [1,2,3,4,5,6,7,8,9,10,11,12,17,18,19,20]
+w_y7 = [1,2,3,4,5,6,7,8,9,10,11,12,16,17,18,19,20]
+w_y8 = [1,2,5,6,7,10,11,12,17,18,19,20]
+w_y9 = [1,2,3,4,5,6,11,12,13,18,19,20]
+w_y10 = [1,2,3,4,5,6,7,10,11,12,13,14,15,17,18,19]
+w_y11 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+w_y12 = [1,2,9,10,11,12,13,14,15,16,17]
+w_y13 = [1,10,11,12,13,14,15,16,17,18]
+w_y14 = [1,2,9,10,11,12,13,16,17,18,19]
+w_y15 = [1,4,5,6,7,8,9,10,11,12,18,19,20]
+w_y16 = [1,4,5,6,7,8,9,18,19,20]
+w_y17 = [1,2,5,6,7,8,9,17,18,19,20]
+w_y18 = [1,2,3,5,6,7,8,9,16,17,18,19,20]
+w_y19 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+w_y20 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+w_y21 = []
+
+w_yall = [
+    w_y0,w_y1,w_y2,w_y3,w_y4,w_y5,w_y6,w_y7,w_y8,w_y9,
+    w_y10,w_y11,w_y12,w_y13,w_y14,w_y15,w_y16,w_y17,w_y18,w_y19,
+    w_y20,w_y21
+]
+
+water = []
+
+# initialize all water on map 
+for y in range(len(w_yall)):
+    for x in range(len(w_yall[y])):
+        prop = Water(w_yall[y][x], y)
+        water.append(prop)
+   
+pprint.pprint(water)
+
 # Proposition to initialize the ship 
+
+@proposition(E)
+class Ship:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"Ship{ self.x, self.y}"
+
+#need to initialize all ship on map
+ship = Ship(1,1)
+
+pprint.pprint(ship)
 
 # Proposition to initialize what kind of cargo is on the ship
 
-# Proposition to initialize the port nodes
-
-# Proposition to initialize the wildcard nodes
-@proposition(E)
-class BasicPropositions:
-
-    def __init__(self, data):
-        self.data = data
+class Cargo:
+    
+    def __init__(self, type):
+        self.type = type
 
     def __repr__(self):
-        return f"A.{self.data}"
+        return f"Cargo_{self.type}"
+
+cargo = [
+    Cargo("Appliances"),
+    Cargo("Cars"),
+    Cargo("Produce")
+]
+
+pprint.pprint(cargo)
+
+# Proposition to initialize the port nodes
+
+class Port:
+    
+    def __init__(self, x, y, has_cargo_type, wants_cargo_type):
+        self.x = x
+        self.y = y
+        self.has_cargo_type = has_cargo_type
+        self.wants_cargo_type = wants_cargo_type
+
+    def __repr__(self):
+        return f"Port{self.x, self.y, self.has_cargo_type, self.wants_cargo_type}"
+
+ports = []
+#need to initialize all ports on map
+for x in range(10):
+    prop = Port(x, 0, cargo[1],cargo[2])
+    ports.append(prop)
+    
+pprint.pprint(ports)
+
+# Proposition to initialize the wildcard nodes
+# @proposition(E)
+# class BasicPropositions:
+
+#     def __init__(self, data):
+#         self.data = data
+
+#     def __repr__(self):
+#         return f"A.{self.data}"
 
 
 ####################################

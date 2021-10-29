@@ -5,3 +5,9 @@ This project models a fictional shipping route based on randomly generated varia
 
 ## Structure
 * `run.py`: File containing the body of the program. 
+
+## Dependencies
+Install the following for run.py to work:
+```bash
+pip install tabulate
+```

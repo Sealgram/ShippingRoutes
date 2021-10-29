@@ -4,4 +4,4 @@ This project models a fictional shipping route based on randomly generated varia
 
 
 ## Structure
-* `idkyet`: Structure goes here 
+* `run.py`: File containing the body of the program. 

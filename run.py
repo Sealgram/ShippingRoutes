@@ -173,6 +173,7 @@ for x in range(10):
     
 pprint.pprint(ports)
 
+
 # Proposition to initialize the wildcard nodes
 # @proposition(E)
 # class BasicPropositions:
@@ -183,12 +184,183 @@ pprint.pprint(ports)
 #     def __repr__(self):
 #         return f"A.{self.data}"
 
+def land_creation():
+    l_y0 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+    l_y1 = [0, 9, 10, 11, 12, 13, 21]
+    l_y2 = [0, 2, 3, 4, 5, 10, 11, 12, 21]
+    l_y3 = [0, 2, 3, 4, 12, 15, 16, 17, 18, 21]
+    l_y4 = [0, 2, 3, 4, 5, 8, 9, 10, 15, 16, 17, 18, 21]
+    l_y5 = [0, 4, 5, 10, 18, 21]
+    l_y6 = [0, 13, 14, 15, 16, 21]
+    l_y7 = [0, 13, 14, 15, 21]
+    l_y8 = [0, 3, 4, 8, 9, 13, 14, 15, 16, 21]
+    l_y9 = [0, 7, 8, 9, 10, 14, 15, 16, 17, 21]
+    l_y10 = [0, 8, 9, 16, 20, 21]
+    l_y11 = [0, 19, 20, 21]
+    l_y12 = [0, 3, 4, 5, 6, 7, 8, 18, 19, 20, 21]
+    l_y13 = [0, 2, 3, 4, 5, 6, 7, 8, 9, 19, 20, 21]
+    l_y14 = [0, 3, 4, 5, 6, 7, 8, 14, 15, 20, 21]
+    l_y15 = [0, 2, 3, 13, 14, 15, 16, 17, 21]
+    l_y16 = [0, 2, 3, 10, 11, 12, 13, 14, 15, 16, 17, 21]
+    l_y17 = [0, 3, 4, 10, 11, 12, 13, 14, 15, 16, 21]
+    l_y18 = [0, 4, 10, 11, 12, 13, 14, 15, 21]
+    l_y19 = [0, 21]
+    l_y20 = [0, 21]
+    l_y21 = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+
+    l_yall = [
+        l_y0, l_y1, l_y2, l_y3, l_y4, l_y5, l_y6, l_y7, l_y8, l_y9,
+        l_y10, l_y11, l_y12, l_y13, l_y14, l_y15, l_y16, l_y17, l_y18, l_y19,
+        l_y20, l_y21
+    ]
+
+    land = []
+
+    # initialize all land on map
+    for y in range(len(l_yall)):
+        for x in range(len(l_yall[y])):
+            prop = Land(l_yall[y][x], y)
+            land.append(prop)
+
+    return land
+
+
+def water_creation():
+    # x water locations for yth row
+    w_y0 = []
+    w_y1 = [1, 2, 3, 4, 5, 6, 7, 8, 14, 15, 16, 17, 18, 19, 20]
+    w_y2 = [1, 6, 7, 8, 9, 13, 14, 15, 16, 17, 18, 19, 20]
+    w_y3 = [1, 5, 6, 7, 8, 9, 10, 11, 13, 14, 19, 20]
+    w_y4 = [1, 6, 7, 11, 12, 13, 14, 19, 20]
+    w_y5 = [1, 2, 3, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 19, 20]
+    w_y6 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 17, 18, 19, 20]
+    w_y7 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 17, 18, 19, 20]
+    w_y8 = [1, 2, 5, 6, 7, 10, 11, 12, 17, 18, 19, 20]
+    w_y9 = [1, 2, 3, 4, 5, 6, 11, 12, 13, 18, 19, 20]
+    w_y10 = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 17, 18, 19]
+    w_y11 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    w_y12 = [1, 2, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+    w_y13 = [1, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+    w_y14 = [1, 2, 9, 10, 11, 12, 13, 16, 17, 18, 19]
+    w_y15 = [1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 18, 19, 20]
+    w_y16 = [1, 4, 5, 6, 7, 8, 9, 18, 19, 20]
+    w_y17 = [1, 2, 5, 6, 7, 8, 9, 17, 18, 19, 20]
+    w_y18 = [1, 2, 3, 5, 6, 7, 8, 9, 16, 17, 18, 19, 20]
+    w_y19 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    w_y20 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+    w_y21 = []
+
+    w_yall = [
+        w_y0, w_y1, w_y2, w_y3, w_y4, w_y5, w_y6, w_y7, w_y8, w_y9,
+        w_y10, w_y11, w_y12, w_y13, w_y14, w_y15, w_y16, w_y17, w_y18, w_y19,
+        w_y20, w_y21
+    ]
+
+    water = []
+
+    # initialize all water on map
+    for y in range(len(w_yall)):
+        for x in range(len(w_yall[y])):
+            prop = Water(w_yall[y][x], y)
+            water.append(prop)
+
+    return water
+
+
+def port_creation():
+    ports = []
+    # need to initialize all ports on map
+    for x in range(10):
+        prop = Port(x, 0, cargo[1], cargo[2])
+        ports.append(prop)
+
+    return ports
+
+
+def map_creation():
+    map = [[0 for x in range(MAX)] for y in range(MAX)]
+
+    land = land_creation()
+    for i in range(len(land)):
+        print("at loop " + str(i))
+        print("putting land at x:" + str(land[i].x) + " y:" + str(land[i].y) + " with object " + str(land[i]))
+        map[land[i].x][land[i].y] = "L"
+
+    water = water_creation()
+    for i in range(len(water)):
+        print("at loop " + str(i))
+        print("putting land at x:" + str(water[i].x) + " y:" + str(water[i].y) + " with object " + str(water[i]))
+        map[water[i].x][water[i].y] = "-"
+
+    ports = port_creation()
+    for i in range(len(ports)):
+        print("at loop " + str(i))
+        print("putting water at x:" + str(ports[i].x) + " y:" + str(ports[i].y) + " with object " + str(ports[i]))
+        map[ports[i].x][ports[i].y] = "P"
+
+    for x in range(MAX):
+        print()
+        for y in range(MAX):
+            print(map[x][y], end='')
+
+    return map
+
+
+def visual():
+    visual = map_creation()
+    visual[1][1] = "S"
+
+    table = [[visual[x][0] for x in range(MAX)], [visual[x][1] for x in range(MAX)], [visual[x][2] for x in range(MAX)],
+             [visual[x][2] for x in range(MAX)], [visual[x][3] for x in range(MAX)],
+             [visual[x][4] for x in range(MAX)], [visual[x][5] for x in range(MAX)], [visual[x][6] for x in range(MAX)],
+             [visual[x][7] for x in range(MAX)], [visual[x][8] for x in range(MAX)],
+             [visual[x][9] for x in range(MAX)], [visual[x][10] for x in range(MAX)],
+             [visual[x][11] for x in range(MAX)], [visual[x][12] for x in range(MAX)],
+             [visual[x][13] for x in range(MAX)],
+             [visual[x][14] for x in range(MAX)], [visual[x][15] for x in range(MAX)],
+             [visual[x][16] for x in range(MAX)], [visual[x][17] for x in range(MAX)],
+             [visual[x][18] for x in range(MAX)],
+             [visual[x][19] for x in range(MAX)], [visual[x][20] for x in range(MAX)],
+             [visual[x][21] for x in range(MAX)]]
+
+    print()
+    print(tabulate(table, tablefmt="fancy_grid"))
+
+
+def things_on_tile(x, y):
+    things=[]
+
+    land = land_creation()
+    for i in range(len(land)):
+        if land[i].x == x and land[i].y == y:
+            things.append(land[i])
+
+    water = water_creation()
+    for i in range(len(water)):
+        if water[i].x == x and water[i].y == y:
+            things.append(water[i])
+
+    ports = port_creation()
+    for i in range(len(ports)):
+        if ports[i].x == x and ports[i].y == y:
+            things.append(ports[i])
+    if ship.x == x and ship.y == y:
+        things.append(ship)
+
+    return things
 
 ####################################
 #
 #   Constraints
 #
 ####################################
+
+
+
+#no 2 things can be on the same tile, must add exception to land and ports and ships and ports, easy fix via if statement checking what is contained within the list
+for x in range(MAX):
+    for y in range(MAX):
+        constraint.add_exactly_one(E, things_on_tile(x,y))
 
 # Port must be on a land node that is adjacent to at least one water node
 

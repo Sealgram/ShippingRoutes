@@ -1,3 +1,125 @@
+Sealgram
+#9063
+🎃
+
+Liam — 09/29/2021
+Aidan Wolf — 10/01/2021
+Anton — 10/01/2021
+Dallin — Yesterday at 1:07 PM
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+
+# Encoding that will store all of your constraints
+Expand
+run.py
+4 KB
+Dallin — Yesterday at 3:13 PM
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+
+# Encoding that will store all of your constraints
+Expand
+run.py
+5 KB
+Dallin — Yesterday at 6:13 PM
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+
+# Encoding that will store all of your constraints
+Expand
+run.py
+6 KB
+Dallin — Yesterday at 7:10 PM
+added water
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+
+# Encoding that will store all of your constraints
+Expand
+run.py
+7 KB
+Liam — Yesterday at 9:36 PM
+all on github now
+Anton — Today at 3:21 AM
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+from tabulate import tabulate
+
+Expand
+run.py
+14 KB
+Dallin — Today at 1:50 PM
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+from tabulate import tabulate
+
+Expand
+run.py
+15 KB
+added port locations
+fixed printed map
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+from tabulate import tabulate
+
+Expand
+run.py
+15 KB
+Anton — Today at 2:45 PM
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+from tabulate import tabulate
+
+Expand
+run_.py
+15 KB
+Dallin — Today at 2:51 PM
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+from tabulate import tabulate
+
+Expand
+run.py
+15 KB
+Anton — Today at 3:11 PM
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+from tabulate import tabulate
+
+Expand
+run.py
+15 KB
+Anton — Today at 3:47 PM
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+from tabulate import tabulate
+
+Expand
+run.py
+15 KB
+Anton — Today at 4:16 PM
 
 from bauhaus import Encoding, proposition, constraint
 from bauhaus.utils import count_solutions, likelihood
@@ -7,6 +129,112 @@ from tabulate import tabulate
 # Encoding that will store all of your constraints
 E = Encoding()
 
+MAX=22
+
+####################################
+#
+#   Propositions
+#
+####################################
+
+# Proposition to initialize the land nodes 
+
+@proposition(E)
+class Land:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"Land{ self.x, self.y}"
+
+
+# #x land locations for yth row
+
+# l_y0 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+# l_y1 = [0,9,10,11,12,13,21]
+# l_y2 = [0,2,3,4,5,10,11,12,21]
+# l_y3 = [0,2,3,4,12,15,16,17,18,21]
+# l_y4 = [0,2,3,4,5,8,9,10,15,16,17,18,21]
+# l_y5 = [0,4,5,10,18,21]
+# l_y6 = [0,13,14,15,16,21]
+# l_y7 = [0,13,14,15,21]
+# l_y8 = [0,3,4,8,9,13,14,15,16,21]
+# l_y9 = [0,7,8,9,10,14,15,16,17,21]
+# l_y10 = [0,8,9,16,20,21]
+# l_y11 = [0,19,20,21]
+# l_y12 = [0,3,4,5,6,7,8,18,19,20,21]
+# l_y13 = [0,2,3,4,5,6,7,8,9,19,20,21]
+# l_y14 = [0,3,4,5,6,7,8,14,15,20,21]
+# l_y15 = [0,2,3,13,14,15,16,17,21]
+# l_y16 = [0,2,3,10,11,12,13,14,15,16,17,21]
+# l_y17 = [0,3,4,10,11,12,13,14,15,16,21]
+# l_y18 = [0,4,10,11,12,13,14,15,21]
+# l_y19 = [0,21]
+# l_y20 = [0,21]
+# l_y21 = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
+
+# l_yall = [
+#     l_y0,l_y1,l_y2,l_y3,l_y4,l_y5,l_y6,l_y7,l_y8,l_y9,
+#     l_y10,l_y11,l_y12,l_y13,l_y14,l_y15,l_y16,l_y17,l_y18,l_y19,
+#     l_y20,l_y21
+# ]
+
+# land = []
+
+# # initialize all land on map 
+# for y in range(len(l_yall)):
+#     for x in range(len(l_yall[y])):
+#         prop = Land(l_yall[y][x], y)
+#         land.append(prop)
+
+# pprint.pprint(land)
+
+# Proposition to initialize the water nodes
+
+@proposition(E)
+class Water:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"Water{ self.x, self.y}"
+
+# #x water locations for yth row
+# w_y0 = []
+# w_y1 = [1,2,3,4,5,6,7,8,14,15,16,17,18,19,20]
+# w_y2 = [1,6,7,8,9,13,14,15,16,17,18,19,20]
+# w_y3 = [1,5,6,7,8,9,10,11,13,14,19,20]
+# w_y4 = [1,6,7,11,12,13,14,19,20]
+# w_y5 = [1,2,3,6,7,8,9,11,12,13,14,15,16,17,19,20]
+# w_y6 = [1,2,3,4,5,6,7,8,9,10,11,12,17,18,19,20]
+# w_y7 = [1,2,3,4,5,6,7,8,9,10,11,12,16,17,18,19,20]
+# w_y8 = [1,2,5,6,7,10,11,12,17,18,19,20]
+# w_y9 = [1,2,3,4,5,6,11,12,13,18,19,20]
+# w_y10 = [1,2,3,4,5,6,7,10,11,12,13,14,15,17,18,19]
+# w_y11 = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18]
+# w_y12 = [1,2,9,10,11,12,13,14,15,16,17]
+# w_y13 = [1,10,11,12,13,14,15,16,17,18]
+# w_y14 = [1,2,9,10,11,12,13,16,17,18,19]
+# w_y15 = [1,4,5,6,7,8,9,10,11,12,18,19,20]
+... (389 lines left)
+Collapse
+run.py
+17 KB
+﻿
+
+from bauhaus import Encoding, proposition, constraint
+from bauhaus.utils import count_solutions, likelihood
+import pprint
+from tabulate import tabulate
+
+# Encoding that will store all of your constraints
+E = Encoding()
+
+MAX=22
 
 ####################################
 #
@@ -448,12 +676,29 @@ for x in range(MAX):
 #  There should be at least 10 variables, and a sufficiently large formula to describe it (>50 operators).
 #  This restriction is fairly minimal, and if there is any concern, reach out to the teaching staff to clarify
 #  what the expectations are.
-def example_theory():
-    T = E.compile()
-    return T
+# def example_theory():
+#     T = E.compile()
+#     return T
+
+def example_theory(): #here atm so program will run
+    # Add custom constraints by creating formulas with the variables you created. 
+    #E.add_constraint( | l2) 
+    # # Implication
+    # E.add_constraint(y >> z)
+    # # Negate a formula
+    # E.add_constraint(~(x&y))
+    # # You can also add more customized "fancy" constraints. Use case: you don't want to enforce "exactly one"
+    # # for every instance of BasicPropositions, but you want to enforce it for a, b, and c.:
+    # constraint.add_exactly_one(E, a, b, c)
+
+    return E
+
 
 
 if __name__ == "__main__":
+
+    visual()
+
 
     T = example_theory()
     # Don't compile until you're finished adding all your constraints!
@@ -463,10 +708,11 @@ if __name__ == "__main__":
     print("\nSatisfiable: %s" % T.satisfiable())
     print("# Solutions: %d" % count_solutions(T))
     print("   Solution: %s" % T.solve())
-
     print("\nVariable likelihoods:")
-    for v,vn in zip([a,b,c,x,y,z], 'abcxyz'):
-        # Ensure that you only send these functions NNF formulas
-        # Literals are compiled to NNF here
-        print(" %s: %.2f" % (vn, likelihood(T, v)))
+    # for v,vn in zip([a,b,c,x,y,z], 'abcxyz'):
+    #     # Ensure that you only send these functions NNF formulas
+    #     # Literals are compiled to NNF here
+    #     print(" %s: %.2f" % (vn, likelihood(T, v)))
     print()
+run.py
+17 KB

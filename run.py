@@ -394,7 +394,6 @@ def things_on_tile(x, y):
 #     for y in range(MAX):
 #         constraint.add_exactly_one(E, things_on_tile(x,y))
 
-#this works
 #if Ship(x, y) is not implied then Ship(x, y) is false in the left side, do we have to imply that a Ship is at said location
 #for i in port:
 #    if i.x == ship.x and i.y == ship.y and i.wants_cargo_type == cargo.type:

@@ -468,10 +468,7 @@ def example_theory(): #here atm so program will run
 
 
 if __name__ == "__main__":
-
     visual()
-
-
     T = example_theory()
     # Don't compile until you're finished adding all your constraints!
     T = T.compile()

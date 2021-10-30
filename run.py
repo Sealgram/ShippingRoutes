@@ -166,6 +166,17 @@ class Port:
     def __repr__(self):
         return f"Port{self.x, self.y, self.has_cargo_type, self.wants_cargo_type}"
 
+@proposition(E)
+class Previous:
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"Previous{self.x, self.y}"
+
+
 
 
 # ports = []
@@ -379,45 +390,62 @@ def things_on_tile(x, y):
 
 
 #no 2 things can be on the same tile, must add exception to land and ports and ships and ports, easy fix via if statement checking what is contained within the list
-for x in range(MAX):
-    for y in range(MAX):
-        constraint.add_exactly_one(E, things_on_tile(x,y))
+# for x in range(MAX):
+#     for y in range(MAX):
+#         constraint.add_exactly_one(E, things_on_tile(x,y))
 
+#this works
 #if Ship(x, y) is not implied then Ship(x, y) is false in the left side, do we have to imply that a Ship is at said location
 #for i in port:
-    #if i.x == ship.x and i.y == ship.y and i.wants_cargo_type == cargo.type:
-        #E.add_constraint(Ship(ship.x, ship.y) >> Port(ship.x, ship.y, 0, 0) & Cargo(i.has_cargo_type))
+#    if i.x == ship.x and i.y == ship.y and i.wants_cargo_type == cargo.type:
+#        E.add_constraint(Ship(ship.x, ship.y) & Port(ship.x, ship.y, i.has_cargo_type, i.wants_cargo_type) & Cargo(i.wants_cargo_type) >> Port(ship.x, ship.y, 0, 0) & Cargo(i.has_cargo_type))
 
-for i in port:
-    if i.x == ship.x and i.y == ship.y and i.wants_cargo_type == cargo.type:
-        E.add_constraint(Ship(ship.x, ship.y) & Port(ship.x, ship.y, i.has_cargo_type, i.wants_cargo_type) & Cargo(i.wants_cargo_type) >> Port(ship.x, ship.y, 0, 0) & Cargo(i.has_cargo_type))
-
+#this work
 #a port must be on edge of land
-for i in port:
-    E.add_constraint(Port(i.x, i.y, i.has_cargo_type, i.wants_cargo_type) & (Water(i.x-1, i.y) | Water(i.x+1, i.y) | Water(i.x, i.y-1) | Water(i.x, i.y+1)) >> Land(i.x, i.y))
+#for i in port:
+#    E.add_constraint(Port(i.x, i.y, i.has_cargo_type, i.wants_cargo_type) & (Water(i.x-1, i.y) | Water(i.x+1, i.y) 
+#    | Water(i.x, i.y-1) | Water(i.x, i.y+1)) & Land(i.x, i.y))
+
+
+
+#for i in port:
+#    constraint.add_at_most_one(E, [(Land(ship.x, ship.y) & ~Ship(ship.x, ship.y)), 
+#    (Land(ship.x, ship.y) & Ship(ship.x, ship.y) & Port(ship.x, ship.y, i.has_cargo_type, i.wants_cargo_type))])
 
 #ship can't touch land unless ship is on port
-for x in range(MAX):
-    for y in range(MAX):
-        for i in port:
-            constraint.add_at_most_one(E, (Land(x, y) & ~Ship(x, y)) | (Land(x, y) & Ship(x,y) & Port(x, y, i.has_cargo_type, i.wants_cargo_type)))
+#for x in range(MAX):
+#    for y in range(MAX):
+#        for i in port:
+#            constraint.add_exactly_one(E, [(Land(x, y) & ~Ship(x, y)), (Land(x, y) & Ship(x,y) & Port(x, y, i.has_cargo_type, i.wants_cargo_type))])
+            # constraint.add_at_most_one(E, (Land(x, y) & ~Ship(x, y)) | (Land(x, y) & Ship(x,y) & Port(x, y, i.has_cargo_type, i.wants_cargo_type)))
+            # E.add_constraint((Land(x, y) & ~Ship(x, y)) | (Land(x, y) & Ship(x,y) & Port(x, y, i.has_cargo_type, i.wants_cargo_type)))
 
 #alternate solution for ship can't touch land unless ship is on port
 #possibly works if we loop the solutions but I doubt it, first solution covers the entire map
-for i in port:
-    constraint.add_at_most_one(E, (Land(ship.x, ship.y) & ~Ship(ship.x, ship.y)) | (Land(ship.x, ship.y) & Ship(ship.x,ship.y) & Port(ship.x, ship.y, i.has_cargo_type, i.wants_cargo_type)))
+# for i in port:
+#     constraint.add_at_most_one(E, (Land(ship.x, ship.y) & ~Ship(ship.x, ship.y)) | (Land(ship.x, ship.y) & Ship(ship.x,ship.y) & Port(ship.x, ship.y, i.has_cargo_type, i.wants_cargo_type)))
 
+#this works
 #port can not have and want the same the cargo type
 #might not need the second variable as the for loop should cover all cargo types
-for i in port:
-    E.add_constraint(~Port(i.x, i.y, i.wants_cargo_type, i.wants_cargo_type) & ~Port(i.x, i.y, i.has_cargo_type, i.has_cargo_type))
+#for i in port:
+#    E.add_constraint(~Port(i.x, i.y, i.wants_cargo_type, i.wants_cargo_type) & ~Port(i.x, i.y, i.has_cargo_type, i.has_cargo_type))
 
 #alternate solution for: port can not have and want the same the cargo type
-cargo_types=["Appliances", "Cars, Produce"]
-for x in range(MAX):
-    for y in range(MAX):
-        for i in cargo_types:
-            E.add_constraint(~Port(x, y, i, i))
+# cargo_types=["Appliances", "Cars, Produce"]
+# for x in range(MAX):
+#     for y in range(MAX):
+#         for i in cargo_types:
+#             E.add_constraint(~Port(x, y, i, i))
+
+# for q in port:
+#     for i in cargo_types:
+#         E.add_constraint(~Port(q.x, q.y, i, i)) 
+
+#E.add_constraint(Ship(ship.x, ship.y) >> Previous(ship.x, ship.y))
+
+#for i in port:
+#   E.add_constraint(Port(i.x, i.y, 0, 0) >> Previous(i.x, i.y))
 
 
 
@@ -464,11 +492,17 @@ def example_theory(): #here atm so program will run
     # constraint.add_exactly_one(E, a, b, c)
 
     return E
+    
+
 
 
 
 if __name__ == "__main__":
+
+    ship=Ship(0,0)
     visual()
+
+
     T = example_theory()
     # Don't compile until you're finished adding all your constraints!
     T = T.compile()
@@ -477,7 +511,10 @@ if __name__ == "__main__":
     print("\nSatisfiable: %s" % T.satisfiable())
     print("# Solutions: %d" % count_solutions(T))
     print("   Solution: %s" % T.solve())
+    E.pprint(T, T.solve())
+    print(E.introspect())
     print("\nVariable likelihoods:")
+    
     # for v,vn in zip([a,b,c,x,y,z], 'abcxyz'):
     #     # Ensure that you only send these functions NNF formulas
     #     # Literals are compiled to NNF here

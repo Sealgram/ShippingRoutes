@@ -1,5 +1,3 @@
-from bauhaus import Encoding, proposition, constraint
-from bauhaus.utils import count_solutions, likelihood
 import pprint
 from tabulate import tabulate
 
@@ -9,83 +7,6 @@ LEFT = -1
 RIGHT = 1
 UP = 2
 DOWN = -2
-
-# Encoding that will store all of your constraints
-E = Encoding()
-
-####################################
-#
-#   Propositions
-#
-####################################
-
-# Proposition to initialize the land nodes 
-@proposition(E)
-class Land:
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __repr__(self):
-        return f"Land{ self.x, self.y}"
-
-@proposition(E)
-class Water:
-
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __repr__(self):
-        return f"Water{ self.x, self.y}"
-
-@proposition(E)
-class Ship:
-
-    def __init__(self, time, x, y, has_cargo_type):
-        self.time = time
-        self.x = x
-        self.y = y
-        self.has_cargo_type = has_cargo_type
-
-    def __repr__(self):
-        return f"Ship{ self.time, self.x, self.y, self.has_cargo_type}"
-
-# Proposition to initialize what kind of cargo is on the ship
-@proposition(E)
-class Cargo:
-    
-    def __init__(self, time, type):
-        self.time = time
-        self.type = type
-
-    def __repr__(self):
-        return f"Cargo_{self.time, self.type}"
-
-# Proposition to initialize the port nodes
-@proposition(E)
-class Port:
-    
-    def __init__(self, time, x, y, has_cargo_type, wants_cargo_type):
-        self.time = time
-        self.x = x
-        self.y = y
-        self.has_cargo_type = has_cargo_type
-        self.wants_cargo_type = wants_cargo_type
-
-    def __repr__(self):
-        return f"Port{self.time, self.x, self.y, self.has_cargo_type, self.wants_cargo_type}"
-
-
-@proposition(E)
-class Time:
-
-    def __init__(self, i):
-        self.i = i
-
-    def __repr__(self):
-        return f"Time{ self.i}"
 
 ####################################
 #
@@ -171,12 +92,6 @@ def visual():
     print()
     print(tabulate(table, tablefmt="fancy_grid"))
 
-####################################
-#
-#   Pathfinding & Etc.
-#
-####################################
-
 def things_on_tile(x, y):
     things=[]
 
@@ -199,6 +114,12 @@ def things_on_tile(x, y):
         things.append(ship)
 
     return things
+
+####################################
+#
+#   Pathfinding Stuff
+#
+####################################
 
 #increment should always start at 0
 def generate_paths(increment, time, visited):
@@ -462,63 +383,3 @@ def is_valid_test(locations, time):
             valid_paths.append(locations[1][x])
 
     return valid_paths
-
-####################################
-#
-#   Constraints Function
-#
-####################################
-
-def theory(locations):
-
-    water = water_creation()
-    land = land_creation()
-    ports = port_creation()
-    for x in locations:
-
-        for i in water:
-            constraint.add_exactly_one(E, i)
-        for i in land:
-            constraint.add_exactly_one(E, i)
-        for i in ports:
-            constraint.add_exactly_one(E, i)
-        for ship in x:
-            constraint.add_exactly_one(E, ship)
-        T = E.compile()
-        sol = T.solve()
-    return T
-
-####################################
-#
-#   Main Method
-#
-####################################
-
-if __name__ == "__main__":
-    time = 2
-    cargo=Cargo(0,"Cars")
-    visual()
-    visited = ([LEFT], [RIGHT], [UP], [DOWN])
-    test = create_trimmed_paths(0,time,visited)
-    parsed = parse(test)
-    paths = is_valid(parsed, time)
-    
-    theory = theory(paths)
-    sol = theory.solve()
-    for keys, values in sol.items():
-        print(keys, ":", values)
-    
-    print()
-    print("\nSatisfiable: %s" % theory.satisfiable())
-    print("# Solutions: %d" % count_solutions(theory))
-    # print("   Solution: %s" % T.solve())
-    
-    # E.pprint(T, T.solve())
-    # print(E.introspect())
-    # print("\nVariable likelihoods:")
-    
-    # for v,vn in zip([a,b,c,x,y,z], 'abcxyz'):
-    #     # Ensure that you only send these functions NNF formulas
-    #     # Literals are compiled to NNF here
-    #     print(" %s: %.2f" % (vn, likelihood(T, v)))
-    print()

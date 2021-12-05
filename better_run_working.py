@@ -36,6 +36,18 @@ class Water:
     def __repr__(self):
         return f"Water{ self.x, self.y}"
 
+
+# @proposition(E)
+# class Ship:
+
+#     def __init__(self, time, x, y):
+#         self.time = time
+#         self.x = x
+#         self.y = y
+
+#     def __repr__(self):
+#         return f"Ship{ self.time, self.x, self.y}"
+
 @proposition(E)
 class Ship:
 
@@ -115,7 +127,7 @@ def land_creation():
 def water_creation():
     w_y0 = []
     w_y1 = [1, 2, 3]
-    w_y2 = [2, 3]
+    w_y2 = [1, 2, 3]
     w_y3 = [2, 3]
     w_y4 = []
     w_yall =[w_y0, w_y1, w_y2, w_y3, w_y4]
@@ -129,8 +141,6 @@ def water_creation():
 
 def port_creation():
     ports = []
-    prop = Port(0, 1, 2, "Appliances", "Cars")
-    ports.append(prop)
     prop = Port(0, 1, 3, "Produce", "Appliances")
     ports.append(prop)
     # pprint.pprint(ports)
@@ -197,20 +207,89 @@ def things_on_tile(x, y):
 
     return things
 
-
-####################################
-#
-#   Generating the Paths
-#
-####################################
+# def generate_paths():
+#     left = (ship.x-1, ship.y)
+#     right = (ship.x+1, ship.y)
+#     up = (ship.x, ship.y-1)
+#     down = (ship.x, ship.y+1)
+#     #idk
 
 LEFT = -1
 RIGHT = 1
 UP = 2
 DOWN = -2
 
+#increment should always start at 0
+def generate_paths(increment, time, visited):
+    print("")
+    print("Generate Paths")
+    print("")
+    ship_copy
+    if increment == time:
+        print("for time step " + str(time) + " these are the avalible moves")
+        return visited
+    elif increment == 0:
+        visited = ([LEFT], [RIGHT], [UP], [DOWN])
+        return generate_paths(increment+1, time, visited)
+    else:
+        new_list = []
+        for i in visited:
+            left = i.copy()
+            left.append(LEFT)
+            right = i.copy()
+            right.append(RIGHT)
+            up = i.copy()
+            up.append(UP)
+            down = i.copy()
+            down.append(DOWN)
+
+            new_list.append(left)
+            new_list.append(up)
+            new_list.append(right)
+            new_list.append(down)
+
+        visited = new_list
+        return generate_paths(increment+1, time, visited)
+        
+
 ship = Ship(0, 1, 1, "Cars")
 ship_locations = []
+
+def is_valid_test(final_list, time):
+    print("")
+    print("is valid test")
+    print("")
+    ship_copy
+    #time variable is used to determine which lists are valid lengths 
+    #(if u can find a better way than passing a var do it)
+
+    water = water_creation()
+    locations = final_list[0]
+    visited = final_list[1]
+
+    
+    valid_paths = []
+    for i in locations:
+        temp_ports = port_creation()
+        temp_list = []
+        for ship in i:
+            for w in water:
+                if ship.x == w.x and ship.y == w.y:
+                    temp_list.append([ship, "water"])
+            for p in temp_ports:
+                if ship.x == p.x and ship.y == p.y and ship.has_cargo_type == p.wants_cargo_type:
+                    ship.has_cargo_type = p.has_cargo_type
+                    p.has_cargo_type = 0
+                    p.wants_cargo_type = 0
+                    temp_list.append([ship, "port, swapped cargo"])
+                elif ship.x == p.x and ship.y == p.y:
+                    temp_list.append([ship, "port, did not swap cargo"])
+
+        if len(temp_list) == time + 1:
+            valid_paths.append(i)
+
+    return valid_paths
+
 
 
 def parse(visited):
@@ -243,7 +322,26 @@ def parse(visited):
         ship_list.append(temp_list)
     # pprint.pprint(ship_list)
     return ship_list
+            
 
+# def is_valid(locations, time):
+#     #time variable is used to determine which lists are valid lengths 
+#     #(if u can find a better way than passing a var do it)
+
+#     water = water_creation()
+
+#     valid_paths = []
+#     # print(locations)
+#     for i in locations:
+#         temp_list = []
+#         for ship in i:
+#             for w in water:
+#                 if ship.x == w.x and ship.y == w.y:
+#                     temp_list.append(ship)
+#         if len(temp_list) == time + 1:
+#             valid_paths.append(temp_list)
+#     pprint.pprint(valid_paths)
+#     return valid_paths
 
 ports = port_creation()
 
@@ -292,9 +390,24 @@ def is_valid(locations, time):
 
     return valid_paths
 
+def win_path(locations):
+    
+    win_paths = []
+
+    for i in locations:
+        counter = 0
+        for j in i:
+            # for k in j:
+            if j[1] == 'port, swapped cargo':
+                counter += 1
+        if counter == len(ports):
+            win_paths.append(i)
+    
+    print("WINNERS")
+    pprint.pprint(win_paths)
+
 #increment should always start at 0
 def create_trimmed_paths(increment, time, visited):
-
     if increment == time:
         print("for time step " + str(time) + " these are the avalible moves")
         print(visited)
@@ -321,6 +434,87 @@ def create_trimmed_paths(increment, time, visited):
 
         visited = new_list
         return create_trimmed_paths(increment+1, time, visited)
+
+def parse_test(visited):
+    ship_copy = Ship(ship.time, ship.x, ship.y, ship.has_cargo_type)
+
+    ship_list = []
+    unparsed_list = []
+
+    for i in visited:
+        time = ship.time
+        ship_copy.x = ship.x
+        ship_copy.y = ship.y 
+        temp_list = []
+        temp_list.append(ship)
+        for j in i:
+            ship_copy.time = time + 1
+            if j == -1:
+                ship_copy.x = ship_copy.x-1
+            elif j == 1:
+                ship_copy.x = ship_copy.x+1
+            elif j == 2:
+                ship_copy.y = ship_copy.y+1
+            elif j == -2:
+                ship_copy.y = ship_copy.y-1
+                
+            ship_temp = Ship(ship_copy.time, ship_copy.x, ship_copy.y, ship.has_cargo_type)
+            temp_list.append(ship_temp)
+            time += 1
+        ship.time
+        ship_list.append(temp_list)
+        unparsed_list.append(i)
+    # pprint.pprint(ship_list)
+    final_list = [ship_list, unparsed_list]
+    return final_list
+
+
+#locations is ship_list 
+#it contains all the ship coordinates for a given time step
+#for time 0 it will have the ship move one to the left, one to the right, one up, and one down
+#the list of valid moves doesn't actually matter we just need the unparsed moves to be sent back after being trimmed 
+#set locations to be of the format [[ship_moves], [uparsed_moves]]
+#use a range for loop and a nested for loop 
+#for ship in i[x]
+def is_valid_test(locations, time):
+    #time variable is used to determine which lists are valid lengths 
+    #(if u can find a better way than passing a var do it)
+
+    water = water_creation()
+
+    valid_paths = []
+    for x in range(len(locations[0])):
+        temp_ports = port_creation()
+        temp_list = []
+        for ship in locations[0][x]:
+            print(ship)
+            for w in water:
+                if ship.x == w.x and ship.y == w.y:
+                    temp_list.append([ship, "water"])
+            for p in temp_ports:
+                if ship.x == p.x and ship.y == p.y:
+                    temp_list.append([ship, "port"])
+                elif ship.x == p.x and ship.y == p.y:
+                    temp_list.append([ship, "port"])
+            
+        if len(temp_list) == time + 1:
+            valid_paths.append(locations[1][x])
+        
+    return valid_paths
+
+# water = water_creation()
+# for i in water:
+#     constraint.add_exactly_one(E, i)
+
+# land = land_creation()
+# for i in land:
+#     constraint.add_exactly_one(E, i)
+
+# for i in ports:
+#     # E.add_constraint(Port(5, i.x, i.y, 0, 0))
+#     constraint.add_exactly_one(E, i)
+
+
 
 def theory(locations):
 
@@ -376,6 +570,8 @@ def theory(locations):
         for ship in x:
             adjacent_tup = []
             adjacent_tdown = []
+            if ship.time == 0:
+                E.add_constraint(ship)
             for temp in x:
                 if (ship.x == temp.x+1 or ship.x == temp.x-1) and ship.y == temp.y and ship.time == temp.time-1:
                     adjacent_tup.append(temp)
@@ -455,6 +651,7 @@ def theory(locations):
 #for time 0 it will be left, right, up, down. etc
 
 
+
 def print_variables(sol, word, state):
 
     print()
@@ -463,6 +660,51 @@ def print_variables(sol, word, state):
             if sol.get(key):
                 print(key, sol.get(key))
     print()
+
+# def is_valid(locations, time):
+#     #time variable is used to determine which lists are valid lengths 
+#     #(if u can find a better way than passing a var do it)
+
+#     water = water_creation()
+
+#     # print(ports.wants_cargo_type)
+
+#     valid_paths = []
+#     for i in locations:
+#         temp_list = []
+#         for ship in i:
+#             for w in water:
+#                 if ship.x == w.x and ship.y == w.y:
+#                     temp_list.append([ship, "water"])
+            
+#             for p in ports:
+#                 if ship.x == p.x and ship.y == p.y and ship.has_cargo_type == p.wants_cargo_type and len(temp_list) == time + 1:
+#                     ship.has_cargo_type = p.has_cargo_type
+#                     p.has_cargo_type = 0
+#                     p.wants_cargo_type = 0
+#                     temp_list.append([ship, "port, swapped cargo"])
+#                     print("ship has: ", ship.has_cargo_type)
+#                     print("port wants: ", p.wants_cargo_type)
+#                     print(p)
+#                 elif ship.x == p.x and ship.y == p.y:
+#                     temp_list.append([ship, "port, did not swap cargo"])
+#                     print("ship has: ", ship.has_cargo_type)
+#                     print("port wants: ", p.wants_cargo_type)
+#                     print(p)
+
+#         if len(temp_list) == time + 1:
+#             valid_paths.append(temp_list)
+#     pprint.pprint(valid_paths)
+
+#     return valid_paths
+
+# def example_theory():
+
+#     # Add the board constraints
+#     # add_board_configuration(board_num)
+
+#     T = E.compile()
+#     return T
 
     
 if __name__ == "__main__":
@@ -484,7 +726,7 @@ if __name__ == "__main__":
 
 
 
-    time = 2
+    time = 1
 
     cargo=Cargo(0,"Cars")
     # ship = Ship(0, 2, 1)

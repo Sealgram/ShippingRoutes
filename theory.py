@@ -2,9 +2,8 @@ from bauhaus import Encoding, proposition, constraint, print_theory
 from bauhaus.utils import count_solutions, likelihood
 import pprint
 from tabulate import tabulate
+import scenarios as S
 
-MAX = 5
-time = 2
 # Encoding that will store all of your constraints
 E = Encoding()
 
@@ -75,10 +74,8 @@ class Port:
         return f"Port{self.time, self.x, self.y, self.has_cargo_type, self.wants_cargo_type}"
 
 
-
 @proposition(E)
 class Time:
-
     def __init__(self, i):
         self.i = i
 
@@ -87,67 +84,11 @@ class Time:
 
 ####################################
 #
-#   Making the Map
+#   Constraints
 #
 ####################################
 
-def land_creation():
-    l_y0 = [0, 1, 2, 3, 4]
-    l_y1 = [0, 4]
-    l_y2 = [0, 4]
-    l_y3 = [0, 4]
-    l_y4 = [0, 1, 2, 3, 4]
-    l_yall = [l_y0, l_y1, l_y2, l_y3, l_y4]
-    land = []
-     # initialize all land on map
-
-    for y in range(len(l_yall)):
-        for x in range(len(l_yall[y])):
-            prop = Land(l_yall[y][x], y)
-            land.append(prop)
-    return land
-
-def water_creation():
-    w_y0 = []
-    w_y1 = [1, 2, 3]
-    w_y2 = [1, 2, 3]
-    w_y3 = [2, 3]
-    w_y4 = []
-    w_yall =[w_y0, w_y1, w_y2, w_y3, w_y4]
-    water = []
-    # initialize all water on map
-    for y in range(len(w_yall)):
-        for x in range(len(w_yall[y])):
-            prop = Water(w_yall[y][x], y)
-            water.append(prop)
-    return water
-
-def port_creation():
-    ports = []
-    prop = Port(0, 1, 3, "Appliances", "Cars")
-    ports.append(prop)
-
-    # pprint.pprint(ports)
-    return ports
-
-def map_creation():
-    map = [[0 for x in range(MAX)] for y in range(MAX)]
-    land = land_creation()
-    for i in range(len(land)):
-        map[land[i].x][land[i].y] = "L"
-
-    water = water_creation()
-    for i in range(len(water)):
-        map[water[i].x][water[i].y] = "-"
-
-    ports = port_creation()
-    for i in range(len(ports)):
-        map[ports[i].x][ports[i].y] = "P"
-
-
-    return map
-
-def ship_creation():
+def ship_creation(MAX, time):
     ships = [] 
     for t in range(time+1):
         for x in range(MAX):
@@ -156,7 +97,7 @@ def ship_creation():
                 ships.append(prop)
     return ships
 
-def cargo_creation():
+def cargo_creation(time):
     cargos = []
     for t in range(time+1):
         prop = Cargo(t, "Cars")
@@ -165,67 +106,27 @@ def cargo_creation():
         cargos.append(prop)
         prop = Cargo(t, "Appliances")
         cargos.append(prop)
-    
     return cargos
 
-def visual():
-    visual = map_creation()
-    ship = Ship(0, 2, 1)
-    visual[ship.x][ship.y] = "S"
+def theory(time, scene, MAX):
+    ships = ship_creation(MAX, time)
+    ships2 = ship_creation(MAX, time)
 
-    table = [[visual[x][0] for x in range(MAX)], [visual[x][1] for x in range(MAX)],
-             [visual[x][2] for x in range(MAX)], [visual[x][3] for x in range(MAX)],
-             [visual[x][4] for x in range(MAX)]]
-
-    print()
-    print(tabulate(table, tablefmt="fancy_grid"))
-
-def things_on_tile(x, y):
-    things=[]
-
-    land = land_creation()
-    for i in range(len(land)):
-        if land[i].x == x and land[i].y == y:
-            things.append(land[i])
-
-    water = water_creation()
-    for i in range(len(water)):
-        if water[i].x == x and water[i].y == y:
-            things.append(water[i])
-
-    ports = port_creation()
-    for i in range(len(ports)):
-        if ports[i].x == x and ports[i].y == y:
-            things.append(ports[i])
-
-    if ship.x == x and ship.y == y:
-        things.append(ship)
-
-    return things
-
-
-
-def theory():
-
-    ships = ship_creation()
-    ships2 = ship_creation()
-
-    prop = Ship(0, 2, 3)
+    prop = Ship(0, 1, 1)
     for ship in ships:
         if ship.x == prop.x and ship.y == prop.y and ship.time == prop.time:
             print("this ship must be true", ship)
             E.add_constraint(ship)
 
+    cargo = cargo_creation(time)
+    water= S.water_creation(scene)
+    land = S.land_creation(scene)
+    ports = S.port_creation(scene)
 
-    cargo = cargo_creation()    
-
-    water= water_creation()
-    land = land_creation()
-    ports = port_creation()
     finished_ports = []
-
     temp_ports = []
     temp_ports2 = []
+
     for i in ports:
         finished_ports.append(Port(i.time, i.x, i.y, 0, 0))
         for t in range(time):
@@ -348,27 +249,87 @@ def theory():
                             #constraint.add_exactly_one(E, t, ship, ~p)
 
 
-
+        #first cargo function
+        #this swaps cargo
         for p in ports:
             if ship.x == p.x and ship.y == p.y and ship.time == p.time:
                 for c in cargo:
                     if c.time == ship.time-1 and c.type == p.wants_cargo_type:
                         for c1 in cargo:
                             if c1.time == ship.time and c1.type == p.has_cargo_type:
-                                E.add_constraint((ship & ~p & c) >> c1)
+                                #this is an exchange 
+                                #no make sense, if those 2 are true port can't be true because all the conditions are fullfilled
+                                E.add_constraint((ship & ~p) >> (c1 & c))
+
+        #ship is consistent, if ship is true then whatever it's tiles condition is it's true
+        #therefore if ship is not on a port then we imply that cargo is the same
+        #we have many ports to consider at any time step, there can be many ports that are true or false
+        #there can only be 1 ship at any time instance
+        #ships are the key
 
 
-    #works but have to simplify this hella 
-    #also doesn't work if can't find a time+1 for either ports or cargo 
+    for p in ports:
+        for t in ports:
+            if p.x == t.x and p.y == t.y and p.time == t.time-1:
+                for c in cargo:
+                    if c.time == t.time and c.type == t.has_cargo_type:
+                        E.add_constraint((p&~t) >> c)
+
+    for p in ports:
+        for t in ports:
+            if p.x == t.x and p.y == t.y and p.time == t.time-1:
+                for c in cargo:
+                    if c.time == p.time and c.type == t.wants_cargo_type:
+                        E.add_constraint((p&~t) >> c)
+
+
+
     for p in ports:
         for t in ports:
             if p.x == t.x and p.y == t.y and p.time+1 == t.time:
                 for c in cargo:
-                    if c.time == p.time:
+                    if c.time == p.time and c.type == p.wants_cargo_type:
                         for c1 in cargo:
+                            if c1.time == t.time and c1.type == p.has_cargo_type:
+                                #this is an exchange
+                                E.add_constraint((c & ~t) >> c1)
                             if c1.time == t.time and c.type == c1.type:
-                                E.add_constraint(c >> c1 | (p&~t))
+                                #there's overlap with the other ports meaning that c doesn't actually have to imply
+                                #if cargo is a thing, then the next cargo is the same or some ports swapped
+                                E.add_constraint((c & t) >> (c1))
+                                #E.add_constraint((c1 & ~t) >> c)
+                                #E.add_constraint((p & t) >> (c & c1))
     
+                                
+
+    #something like  E.add_constraint(c & t >> c1)
+
+
+    #second cargo function
+    #if cargo is of a current type it stays the same unless a port is fullfilled and therefore the cargo is changed
+    #for p in ports:
+    #for t in ports:
+        #if p.x == t.x and p.y == t.y and p.time+1 == t.time:
+            #for c in cargo:
+                #if c.time == p.time:
+                    #for c1 in cargo:
+                        #if c1.time == t.time and c.type == c1.type:
+                            #E.add_constraint(c >> (c1 | (p&~t)))
+                            #if c.type == p.wants_cargo_type:
+                                #E.add_constraint((p&~t) >> c)
+                            
+
+    #p is a port at a time step
+    #t is the same port with time +1 
+    #c is cargo at p's time step
+    #t is cargo at t's time step
+    #we need to say if port is not done and then done at the next step then cargo at the initial step must have been the wants 
+
+
+    
+
+    #it can't handle 2 ports 
+    #probably because p&~t hits all ports so there's conflict 
 
 
 
@@ -408,56 +369,37 @@ def theory():
 
 
     T = E.compile()
-    sol = T.solve()
-    print()
-    #E.pprint(T, sol, True)
-    
-    print()
     print("\nSatisfiable: %s" % T.satisfiable())
-    pprint.pprint(sol)
-
-    print_variables(sol, "Ship", True)
-    print_variables(sol, "Cargo", True)
-    print_variables(sol, "Port", True)
-    print()
-    print_theory(sol, "both")
-
-    #print(key)
-    #print(sol.values())
-
-        #for ship in x:
-            #constraint.add_at_most_k(E, 2, Ship)
-            #constraint.add_at_least_one(E, Ship)
-            #constraint.add_at_most_one(E, ship)
-
     return T
 
 
 
-def print_variables(sol, word, state):
-
-    print()
-    for i in range(time+1):
-        for key in sol:
-            if word in str(key):
-                if sol.get(key) and key.time == i:
-                    print(key, sol.get(key))
-    print()
+def print_variables(sol, word, state, time):
+    if sol:
+        for i in range(time+1):
+            for key in sol:
+                if word in str(key):
+                    if sol.get(key) and key.time == i:
+                        print(key, sol.get(key))
 
 
+def solve(time, scene, MAX):
+    a_theory = theory(time, scene, MAX)
+    sol = a_theory.solve()
+    print_variables(sol, "Ship", True, time)
+    print_variables(sol, "Cargo", True, time)
+    print_variables(sol, "Port", True, time)
+    print("\nSatisfiable: %s" % a_theory.satisfiable())
+    print("# Solutions: %d" % count_solutions(a_theory))
 
     
 if __name__ == "__main__":
-
-    time = 1
-
-    cargo=Cargo(0,"Cars")
-    visual()
-
-    theory = theory()
+    time = 3
+    S.scenarios(1, 5, Ship(0, 2, 1))
+    theory = theory(time, 1, 5)
     sol = theory.solve()
-
+    print_variables(sol, "Ship", True, time)
+    print_variables(sol, "Cargo", True, time)
+    print_variables(sol, "Port", True, time)
     print("\nSatisfiable: %s" % theory.satisfiable())
     print("# Solutions: %d" % count_solutions(theory))
-
-    print()

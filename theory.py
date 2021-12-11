@@ -57,7 +57,7 @@ class Cargo:
         self.type = type
 
     def __repr__(self):
-        return f"Cargo_{self.time, self.type}"
+        return f"Cargo{self.time, self.type}"
 
 # Proposition to initialize the port nodes
 @proposition(E)
@@ -74,13 +74,6 @@ class Port:
         return f"Port{self.time, self.x, self.y, self.has_cargo_type, self.wants_cargo_type}"
 
 
-@proposition(E)
-class Time:
-    def __init__(self, i):
-        self.i = i
-
-    def __repr__(self):
-        return f"Time{ self.i}"
 
 ####################################
 #
@@ -89,317 +82,242 @@ class Time:
 ####################################
 
 def ship_creation(MAX, time):
-    ships = [] 
+    ships = {}
     for t in range(time+1):
+        temp = {}
         for x in range(MAX):
             for y in range(MAX):
                 prop = Ship(t, x, y)
-                ships.append(prop)
+                temp.update({(x,y):prop})
+        ships.update({t:temp})
     return ships
 
 def cargo_creation(time):
-    cargos = []
+    cargos = {}
     for t in range(time+1):
+        temp = {}
         prop = Cargo(t, "Cars")
-        cargos.append(prop)
+        temp.update({"Cars":prop})
         prop = Cargo(t, "Produce")
-        cargos.append(prop)
+        temp.update({"Produce":prop})
         prop = Cargo(t, "Appliances")
-        cargos.append(prop)
+        temp.update({"Appliances":prop})
+        cargos.update({t:temp})
     return cargos
 
-def theory(time, scene, MAX):
-    ships = ship_creation(MAX, time)
-    ships2 = ship_creation(MAX, time)
+def expand_ports(time, scene):
+    ports = S.port_creation(scene)
+    ports_dict = {}
+    for t in range(time+1):
+        temp = {}
+        for p in ports:
+            prop = Port(t, p.x, p.y, p.has_cargo_type, p.wants_cargo_type)
+            temp.update({(p.x,p.y):prop})    
+        ports_dict.update({t:temp})
 
-    prop = Ship(0, 1, 1)
-    for ship in ships:
-        if ship.x == prop.x and ship.y == prop.y and ship.time == prop.time:
-            print("this ship must be true", ship)
-            E.add_constraint(ship)
+    return ports_dict
+
+def theory(time, scene, MAX, start_ship):
+    ships = ship_creation(MAX, time)
+
+    prop = start_ship
+    E.add_constraint(ships[0][prop.x,prop.y])
 
     cargo = cargo_creation(time)
     water= S.water_creation(scene)
     land = S.land_creation(scene)
-    ports = S.port_creation(scene)
+    ports = expand_ports(time, scene)
 
-    finished_ports = []
-    temp_ports = []
-    temp_ports2 = []
-
-    for i in ports:
-        finished_ports.append(Port(i.time, i.x, i.y, 0, 0))
-        for t in range(time):
-            prop = Port(t+1, i.x, i.y, i.has_cargo_type, i.wants_cargo_type)
-            temp_ports.append(prop)
-            temp_ports2.append(Port(t+1, i.x, i.y, 0, 0))
-    for i in temp_ports:
-        ports.append(i)
-    for i in temp_ports2:
-        finished_ports.append(i)
-
+    #all land is true
+    #land implies no ship on that square
+    for l in land:
+        for t in ships.values():
+            ship = t[l.x,l.y]
+            E.add_constraint(l)
+            E.add_constraint(l >> ~ship)
+ 
     #this constraint states any given port at any time step can either have it's goods or be finished
-    for i in range(len(ports)):
-        constraint.add_exactly_one(E, ports[i], finished_ports[i])
+    for t in ports.values():
+        for p in t.values():
+            constraint.add_exactly_one(E, p, Port(p.time, p.x, p.y, 0, 0))
 
-    #makes that ports at the last time step MUST be true
-    for p in finished_ports:
-        if p.time == time:
-            print(p, "must be true")
-            E.add_constraint(p)
+    #makes that ports at the last time step MUST be finished
+    for p in ports[time].values():
+        E.add_constraint(~p)
 
-    for p in ports:
-        if p.time == 0:
-            E.add_constraint(p)
+    #port at time step 0 must be unfinished
+    for p in ports[0].values():
+        E.add_constraint(p)
 
-
-    for p in ports:
+    #atleast one ship must touch every single port within it's trip
+    #apparently doesn't do anything currently
+    for p in ports[0]:
         lst = []
-        for ship in ships:
-            if ship.x == p.x and ship.y == p.y:
-                lst.append(ship)
-        if len(lst) != 0:
-            constraint.add_at_least_one(E, *lst)
-
+        for t in ships.values():
+            lst.append(t[p])
+        constraint.add_at_least_one(E, *lst)
+ 
 
     #if a finished port is true then the finished port at the next time step must also be true 
-    for p in finished_ports:
-        for t in finished_ports:
-            if p.x == t.x and p.y == t.y and t.time+1 == p.time:
-                constraint.add_implies_all(E, t, p)
+    for t in range(time):
+        for p in ports[t].values():
+            prop = ports[t+1][(p.x,p.y)]
+            # print("if not ", p, " then also not ", prop)
+            E.add_constraint(~p >> ~prop)
+            # constraint.add_implies_all(E, ~p, ~prop)
+
+
         
-
-    #this entire chunk makes sure that any new Ship steps must be adjacent to the one currently implemented 
-    #an implication is true if both are false 
-    #how does one enforce adjacency 
-    for ship in ships:
-        adjacent_tup = []
-        adjacent_tdown = []
-        for temp in ships:
-            if (ship.x == temp.x+1 or ship.x == temp.x-1) and ship.y == temp.y and ship.time+1 == temp.time:
-                adjacent_tup.append(temp)
-            elif ship.x == temp.x and (ship.y == temp.y+1 or ship.y == temp.y-1) and ship.time+1 == temp.time:
-                adjacent_tup.append(temp)
-            elif ship.x == temp.x and (ship.y == temp.y+1 or ship.y == temp.y-1) and ship.time-1 == temp.time:
-                adjacent_tdown.append(temp)
-            elif (ship.x == temp.x+1 or ship.x == temp.x-1) and ship.y == temp.y and ship.time-1 == temp.time:
-                adjacent_tdown.append(temp)
-
-        #this is pointless as of rn because the only one ship per time is already in place
-        #needs to be modfied 
-        if len(adjacent_tup) != 0:
-            #constraint.add_implies_all(E, *adjacent_tup, ship)
-            #constraint.add_at_most_one(E, ship, *adjacent_tup)
-            #constraint.add_exactly_one(E, *adjacent_tup)
-            if len(adjacent_tup) == 1:
-                E.add_constraint(ship >> adjacent_tup[0])
-            elif len(adjacent_tup) == 2:
-                E.add_constraint(ship >> adjacent_tup[0] | adjacent_tup[1])
-            elif len(adjacent_tup) == 3:
-                E.add_constraint(ship >> adjacent_tup[0] | adjacent_tup[1] | adjacent_tup[2])
-            else:
-                #constraint.add_implies_all(E, ship, (~adjacent_tup[0] | ~adjacent_tup[1] | ~adjacent_tup[2] | ~adjacent_tup[3]) & ship)
-                E.add_constraint(ship >> adjacent_tup[0] | adjacent_tup[1] | adjacent_tup[2] | adjacent_tup[3])
-        if len(adjacent_tdown) != 0:
-            #constraint.add_at_most_one(E, *adjacent_tdown)
-            if len(adjacent_tdown) == 1:
-                E.add_constraint(ship >> adjacent_tdown[0])
-            elif len(adjacent_tdown) == 2:
-                E.add_constraint(ship >> adjacent_tdown[0] | adjacent_tdown[1])
-            elif len(adjacent_tdown) == 3:
-                E.add_constraint(ship >> adjacent_tdown[0] | adjacent_tdown[1] | adjacent_tdown[2])
-            else:
-                E.add_constraint(ship >> adjacent_tdown[0] | adjacent_tdown[1] | adjacent_tdown[2] | adjacent_tdown[3])
-            #constraint.add_exactly_one(E, *adjacent_tdown)
+    #ship can't be beyond the boundary 
+    for t in ships.values():
+        lst = t.keys()
+        for key in lst:
+            if key.count(0) > 0 or key.count(MAX-1) > 0:
+                prop = t[key]
+                E.add_constraint(~prop)
 
 
+    #if a given ship not at the final time step is true
+    #then there must be an adjacent ship at the next time step that is true
+    for t in range(time):
+        for key in ships[t]:
+            if key.count(0) == 0 and key.count(MAX-1) == 0:
+                ship = ships[t][key]
+                adj_up = ships[t+1][ship.x,ship.y+1]
+                adj_down = ships[t+1][ship.x,ship.y-1]
+                adj_right = ships[t+1][ship.x+1,ship.y]
+                adj_left = ships[t+1][ship.x-1,ship.y]
+                E.add_constraint(ship >>  adj_up | adj_down | adj_right | adj_left)
 
-        #print("adjacent to ship:", ship)
-        #print(adjacent_tup)
-        #print(adjacent_tdown)
-        #print()
+    #if a given ship not at time step 0 is true
+    #then there must be an adjacent ship at the previous time step is true 
+    #I wonder if this is useless considiring adjacency might be completley enforced by the previous constraints 
+    #gonna keep it commented out for now
+    # for t in range(1, time+1):
+    #     for key in ships[t]:
+    #         if key.count(0) == 0 and key.count(MAX-1) == 0:
+    #             ship = ships[t][key]
+    #             adj_up = ships[t-1][ship.x,ship.y+1]
+    #             adj_down = ships[t-1][ship.x,ship.y-1]
+    #             adj_right = ships[t-1][ship.x+1,ship.y]
+    #             adj_left = ships[t-1][ship.x-1,ship.y]
+    #             print(adj_up, " ", adj_down, " ", adj_left, " ", adj_right, " are all adjacent to ", ship)
+    #             E.add_constraint(ship >>  adj_up | adj_down | adj_right | adj_left)
 
+    #if a port is finished, either the previous port is also finished or a ship has just touched the port
+    for t in ports.values():
+        for p in t.values():
+            if p.time != 0:
+                ship = ships[p.time][p.x,p.y]
+                prev_p = ports[p.time-1][p.x,p.y]
+                print("if not ", p, " then not ", prev_p, " or ", ship)
+                E.add_constraint(~p >> (~prev_p | ship))
 
-        #any given finished port is either currently being touched by a ship or the port one time step below it is finished 
-        #so just make the statement false or smthn 
-        for p in finished_ports:
-            if ship.x == p.x and ship.y == p.y and ship.time == p.time and p.time != 0:
-                for t in finished_ports:
-                    if ship.x == t.x and ship.y == t.y and ship.time == t.time+1:
-                        #print("did this")
-                        #print("added constraint ", t, " or ", ship, " or not ", p)
-                        
-                        #a finished port implies the previous port is also finished or there is a ship currently at the port
-                        constraint.add_at_most_one(E, t, ship)
-                        E.add_constraint(p >> t | ship)
-                        #constraint.add_exactly_one(E, t, ship, ~p)
+    #if a port is unfinished, either the next port is also unfished or a ship has just touched the next port
+    for t in ports.values():
+        for p in t.values():
+            if p.time != time:
+                ship = ships[p.time+1][p.x,p.y]
+                next_p = ports[p.time+1][p.x,p.y]
+                constraint.add_at_most_one(E, next_p, ship)
+                print("if ", p, " then ", next_p, " or ", ship, " but not both")
+                E.add_constraint(p >> next_p | ship)
 
-
-                
-        
-
-        for p in ports:
-            #if there is a ship at a time step above the port, either that ship can be true or the unfinished port can be true, but not both 
-            if ship.x == p.x and ship.y == p.y and ship.time == p.time+1:
-                    for t in ports:
-                        if p.x == t.x and p.y == t.y and p.time+1 == t.time:
-                            #an unfinished port implies the next port is also unfinished or there is a ship at the next port
-                            constraint.add_at_most_one(E, t, ship)
-                            E.add_constraint(p >> t | ship)
-                            #constraint.add_exactly_one(E, t, ship, ~p)
-
-
-        #first cargo function
-        #this swaps cargo
-        for p in ports:
-            if ship.x == p.x and ship.y == p.y and ship.time == p.time:
-                for c in cargo:
-                    if c.time == ship.time-1 and c.type == p.wants_cargo_type:
-                        for c1 in cargo:
-                            if c1.time == ship.time and c1.type == p.has_cargo_type:
-                                #this is an exchange 
-                                #no make sense, if those 2 are true port can't be true because all the conditions are fullfilled
-                                E.add_constraint((ship & ~p) >> (c1 & c))
-
-        #ship is consistent, if ship is true then whatever it's tiles condition is it's true
-        #therefore if ship is not on a port then we imply that cargo is the same
-        #we have many ports to consider at any time step, there can be many ports that are true or false
-        #there can only be 1 ship at any time instance
-        #ships are the key
-
-
-    for p in ports:
-        for t in ports:
-            if p.x == t.x and p.y == t.y and p.time == t.time-1:
-                for c in cargo:
-                    if c.time == t.time and c.type == t.has_cargo_type:
-                        E.add_constraint((p&~t) >> c)
-
-    for p in ports:
-        for t in ports:
-            if p.x == t.x and p.y == t.y and p.time == t.time-1:
-                for c in cargo:
-                    if c.time == p.time and c.type == t.wants_cargo_type:
-                        E.add_constraint((p&~t) >> c)
+    #swaps cargo
+    #if a ship is on a port and the port is finished. Then the ship must have had the proper cargo and now contains the appropriate cargo
+    for t in ports.values():
+        for p in t.values():
+            if p.time != 0:
+                ship = ships[p.time][p.x,p.y]
+                curr_cargo = cargo[p.time-1][p.wants_cargo_type]
+                next_cargo = cargo[p.time][p.has_cargo_type]
+                print("if ", ship, " and not ", p, " implies the current cargo is ", curr_cargo, " and the next cargo is ", next_cargo)
+                E.add_constraint((ship & ~p) >> (curr_cargo & next_cargo))
 
 
 
-    for p in ports:
-        for t in ports:
-            if p.x == t.x and p.y == t.y and p.time+1 == t.time:
-                for c in cargo:
-                    if c.time == p.time and c.type == p.wants_cargo_type:
-                        for c1 in cargo:
-                            if c1.time == t.time and c1.type == p.has_cargo_type:
-                                #this is an exchange
-                                E.add_constraint((c & ~t) >> c1)
-                            if c1.time == t.time and c.type == c1.type:
-                                #there's overlap with the other ports meaning that c doesn't actually have to imply
-                                #if cargo is a thing, then the next cargo is the same or some ports swapped
-                                E.add_constraint((c & t) >> (c1))
-                                #E.add_constraint((c1 & ~t) >> c)
-                                #E.add_constraint((p & t) >> (c & c1))
-    
-                                
+    for t in ports.values():
+        for p in t.values():
+            if p.time != 0:
+                prev_p = ports[p.time-1][p.x,p.y]
+                curr_cargo = cargo[p.time-1][p.wants_cargo_type]
+                next_cargo = cargo[p.time][p.has_cargo_type]
+                print("if ", prev_p, " and not ", p, " then cargo must have been ", curr_cargo)
+                E.add_constraint((~p&prev_p) >> (curr_cargo & next_cargo))
+                # print("if ", prev_p, " and not ", p, " then cargo must currently be ", next_cargo)
+                # E.add_constraint((~p&prev_p) >> next_cargo)
 
-    #something like  E.add_constraint(c & t >> c1)
-
-
-    #second cargo function
-    #if cargo is of a current type it stays the same unless a port is fullfilled and therefore the cargo is changed
-    #for p in ports:
-    #for t in ports:
-        #if p.x == t.x and p.y == t.y and p.time+1 == t.time:
-            #for c in cargo:
-                #if c.time == p.time:
-                    #for c1 in cargo:
-                        #if c1.time == t.time and c.type == c1.type:
-                            #E.add_constraint(c >> (c1 | (p&~t)))
-                            #if c.type == p.wants_cargo_type:
-                                #E.add_constraint((p&~t) >> c)
-                            
-
-    #p is a port at a time step
-    #t is the same port with time +1 
-    #c is cargo at p's time step
-    #t is cargo at t's time step
-    #we need to say if port is not done and then done at the next step then cargo at the initial step must have been the wants 
+    #if ship is on a water tile then cargo must currently be the same as last cargo
+    for w in water:
+        E.add_constraint(w)
+        lst = []
+        for t in range(1, time+1):
+            ship = ships[t][w.x,w.y]
+            lst.append(ship)
+            for curr_cargo in cargo[t].values():
+                prev_cargo = cargo[t-1][curr_cargo.type]
+                E.add_constraint((w & ship & prev_cargo) >> (curr_cargo))
 
 
-    
-
-    #it can't handle 2 ports 
-    #probably because p&~t hits all ports so there's conflict 
-
-
+    for t in ships.values():
+        ships_at_t = t.values()
+        print("at most one of ", ships_at_t)
+        constraint.add_exactly_one(E, *ships_at_t)
 
 
-    for t in range(time+1):
-        temp_list = []
-        for ship in ships:
-            if ship.time == t:
-                temp_list.append(ship)                
-
-        print()
-        print(temp_list)
-        print()
-        print(t)
-        constraint.add_exactly_one(E, *temp_list)
-
-
-
-    for t in range(time+1):
-        temp_list = []
-        for c in cargo:
-            if c.time == t:
-                temp_list.append(c)
-
-        constraint.add_exactly_one(E, *temp_list)
-                    
-
-            #for p in ports:
-            #    if ship.x == p.x and ship.y == p.y and ship.time == p.time:
-            #        constraint.add_exactly_one(E, p, ship)
-            
-    #if port is at max time it must be 0,0 that implies it was either touched before or at that turn
-    #set the last ports to be unconditonally true since it's our win condition 
-    #IT WORKS
-    #need to constrain that if it hasn't been touched by ship it CAN'T BE FULLFILLED
-
+    for t in cargo.values():
+        cargo_at_t = t.values()
+        print("at most one of ", cargo_at_t)
+        constraint.add_exactly_one(E, *cargo_at_t)
 
 
     T = E.compile()
-    print("\nSatisfiable: %s" % T.satisfiable())
     return T
 
 
 
-def print_variables(sol, word, state, time):
+def get_variables(sol, word, time):
+    var = []
     if sol:
         for i in range(time+1):
             for key in sol:
                 if word in str(key):
                     if sol.get(key) and key.time == i:
+                        var.append(key)
                         print(key, sol.get(key))
+    return var
 
 
-def solve(time, scene, MAX):
-    a_theory = theory(time, scene, MAX)
+def solve(time, scene, MAX, ship):
+    a_theory = theory(time, scene, MAX, ship)
     sol = a_theory.solve()
-    print_variables(sol, "Ship", True, time)
-    print_variables(sol, "Cargo", True, time)
-    print_variables(sol, "Port", True, time)
+    valids = []
+    valids.append(get_variables(sol, "Ship", time))
+    valids.append(get_variables(sol, "Cargo", time))
+    valids.append(get_variables(sol, "Port", time))
     print("\nSatisfiable: %s" % a_theory.satisfiable())
     print("# Solutions: %d" % count_solutions(a_theory))
+    return valids
+
 
     
 if __name__ == "__main__":
     time = 3
-    S.scenarios(1, 5, Ship(0, 2, 1))
-    theory = theory(time, 1, 5)
-    sol = theory.solve()
-    print_variables(sol, "Ship", True, time)
-    print_variables(sol, "Cargo", True, time)
-    print_variables(sol, "Port", True, time)
-    print("\nSatisfiable: %s" % theory.satisfiable())
-    print("# Solutions: %d" % count_solutions(theory))
+    MAX = 3
+    ships = ship_creation(time, MAX)
+    print(ships[2].values())
+    for ship in ships[2].values(): print(ship) if ship.x != 0 else ship
+    print(ships[2].values()) 
+
+    cargo=cargo_creation(time)
+    print(cargo[2].values())
+    for ship in cargo[2].values(): print(ship) if ship.type == "Cars" else ship
+    print(cargo[2].values()) 
+    #S.scenarios(1, 5, Ship(0, 2, 1))
+    #theory = theory(time, 1, 5)
+    #sol = theory.solve()
+    #print_variables(sol, "Ship", True, time)
+    #print_variables(sol, "Cargo", True, time)
+    #print_variables(sol, "Port", True, time)
+    #print("\nSatisfiable: %s" % theory.satisfiable())
+    #print("# Solutions: %d" % count_solutions(theory))

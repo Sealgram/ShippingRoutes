@@ -31,7 +31,42 @@ def print_scenarios(pv):
         S.scenarios(4, 9, start_ship(4))
     if pv == 5 or pv == 6:
         print("\nScenario 5:")
-        S.scenarios(4, 9, start_ship(5))
+        S.scenarios(5, 9, start_ship(5))
+
+def print_progress(pv, ship):
+    if pv == 1:
+        S.scenarios(1, 5, ship)
+    if pv == 2:
+        S.scenarios(2, 5, ship)
+    if pv == 3:
+        S.scenarios(3, 6, ship)
+    if pv == 4:
+        S.scenarios(4, 9, ship)
+    if pv == 5:
+        S.scenarios(5, 9, ship)
+
+
+def print_solutions(scene, valids):
+    if valids[0]:
+        print("\n\nThe Voyage:")
+        count = 0
+        for ship in valids[0]:
+            portcount = 0
+            for port in valids[2]:
+                if ship.x == port.x and ship.y == port.y:
+                    portcount = 1
+            if portcount == 1:
+                    print(f"\nAt timestep {count}, the ship was at coordinates ({ship.x}, {ship.y}), at a port:")
+                    print_progress(scene, ship)
+                    print(f"The ship dropped off {valids[1][count - 1].type} and picked up {valids[1][count].type}.")
+            else:
+                print(f"\nAt timestep {count}, the ship was at coordinates ({ship.x}, {ship.y}) in the water, carrying {valids[1][count].type}:")
+                print_progress(scene, ship)
+            count += 1
+            portcount = 0
+        print("\nIt's journey finished, the shipped dropped anchor.\n\n\n")
+    else:
+        print("\nThe ship's journey could not be completed in the indicated timestep.\n\n\n")
 
 
 if __name__ == "__main__":
@@ -54,12 +89,12 @@ if __name__ == "__main__":
     while True:
         try:
             time = int(input("\nEnter the time you would like the program to solve within: "))
-            if time > 2 and time < 51:
+            if time > 1 and time < 51:
                 break
             else:
-                print("\nInvalid input. Enter an integer between 2 and 51.")
+                print("\nInvalid input. Enter an integer between 1 and 51.")
         except:
-            print("\nNot an integer. Enter an integer between 2 and 51.")
+            print("\nNot an integer. Enter an integer between 1 and 51.")
 
     MAX = 0
     if scene == 1 or scene == 2:
@@ -72,4 +107,5 @@ if __name__ == "__main__":
     print(f"\nScenario {scene} will be attempted to be solved with time {time}.\n")
     print_scenarios(scene)
     print()
-    T.solve(time, scene, MAX)
+    valids = T.solve(time, scene, MAX, start_ship(scene))
+    print_solutions(scene, valids)

@@ -10,48 +10,48 @@ import theory as T
 
 def land_creation(scene):
     if scene == 1:
-        l_y0 = [0, 1, 2, 3, 4]
-        l_y1 = [0, 4]
-        l_y2 = [0, 4]
-        l_y3 = [0, 4]
-        l_y4 = [0, 1, 2, 3, 4]
+        l_y0 = []
+        l_y1 = []
+        l_y2 = []
+        l_y3 = []
+        l_y4 = []
         l_yall = [l_y0, l_y1, l_y2, l_y3, l_y4]
     if scene == 2:
-        l_y0 = [0, 1, 2, 3, 4]
-        l_y1 = [0, 4]
-        l_y2 = [0, 2, 4]
-        l_y3 = [0, 4]
-        l_y4 = [0, 1, 2, 3, 4]
+        l_y0 = []
+        l_y1 = []
+        l_y2 = [2]
+        l_y3 = []
+        l_y4 = []
         l_yall = [l_y0, l_y1, l_y2, l_y3, l_y4]
     if scene == 3:
-        l_y0 = [0, 1, 2, 3, 4, 5]
-        l_y1 = [0, 5]
-        l_y2 = [0, 2, 4, 5]
-        l_y3 = [0, 1, 5]
-        l_y4 = [0, 1, 5]
-        l_y5 = [0, 1, 2, 3, 4, 5]
+        l_y0 = []
+        l_y1 = []
+        l_y2 = [2, 4]
+        l_y3 = [1]
+        l_y4 = [1]
+        l_y5 = []
         l_yall = [l_y0, l_y1, l_y2, l_y3, l_y4, l_y5]
     if scene == 4:
-        l_y0 = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        l_y1 = [0, 7, 8]
-        l_y2 = [0, 7, 8]
-        l_y3 = [0, 4, 8]
-        l_y4 = [0, 3, 4, 5, 8]
-        l_y5 = [0, 3, 4, 8]
-        l_y6 = [0, 1, 8]
-        l_y7 = [0, 1, 2, 8]
-        l_y8 = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        l_y0 = []
+        l_y1 = [7]
+        l_y2 = [7]
+        l_y3 = [4]
+        l_y4 = [3, 4, 5]
+        l_y5 = [3, 4]
+        l_y6 = [1]
+        l_y7 = [1, 2]
+        l_y8 = []
         l_yall = [l_y0, l_y1, l_y2, l_y3, l_y4, l_y5, l_y6, l_y7, l_y8]
     if scene == 5:
-        l_y0 = [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        l_y1 = [0, 1, 2, 7, 8]
-        l_y2 = [0, 1, 7, 8]
-        l_y3 = [0, 3, 4, 8]
-        l_y4 = [0, 3, 4, 5, 8]
-        l_y5 = [0, 2, 3, 4, 5, 8]
-        l_y6 = [0, 3, 5, 8]
-        l_y7 = [0, 8]
-        l_y8 = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        l_y0 = []
+        l_y1 = [1, 2, 7]
+        l_y2 = [1, 7]
+        l_y3 = [3, 4]
+        l_y4 = [3, 4, 5]
+        l_y5 = [2, 3, 4, 5]
+        l_y6 = [3, 5]
+        l_y7 = []
+        l_y8 = []
         l_yall = [l_y0, l_y1, l_y2, l_y3, l_y4, l_y5, l_y6, l_y7, l_y8]
     land = []
     # initialize all land on map
@@ -80,30 +80,30 @@ def water_creation(scene):
         w_y0 = []
         w_y1 = [1, 2, 3, 4]
         w_y2 = [1, 3]
-        w_y3 = [2, 3, 4]
-        w_y4 = [2, 3, 4]
+        w_y3 = [3, 4]
+        w_y4 = [2, 3]
         w_y5 = []
         w_yall =[w_y0, w_y1, w_y2, w_y3, w_y4, w_y5]
     if scene == 4:
         w_y0 = []
-        w_y1 = [1, 2, 3, 4, 5, 6]
+        w_y1 = [2, 3, 4, 5, 6]
         w_y2 = [1, 2, 3, 4, 5, 6]
         w_y3 = [1, 2, 3, 5, 6, 7]
-        w_y4 = [1, 2, 6, 7]
+        w_y4 = [2, 6, 7]
         w_y5 = [1, 2, 5, 6, 7]
         w_y6 = [2, 3, 4, 5, 6, 7]
-        w_y7 = [3, 4, 5, 6, 7]
+        w_y7 = [3, 4, 5, 6]
         w_y8 = []
         w_yall = [w_y0, w_y1, w_y2, w_y3, w_y4, w_y5, w_y6, w_y7, w_y8]
     if scene == 5:
         w_y0 = []
         w_y1 = [3, 4, 5, 6]
-        w_y2 = [2, 3, 4, 5, 6]
-        w_y3 = [1, 2, 5, 6, 7]
+        w_y2 = [3, 4, 5, 6]
+        w_y3 = [1, 2, 5, 6]
         w_y4 = [1, 2, 6, 7]
         w_y5 = [1, 6, 7]
-        w_y6 = [1, 2, 4, 6, 7]
-        w_y7 = [1, 2, 3, 4, 5, 6, 7]
+        w_y6 = [1, 2, 6, 7]
+        w_y7 = [1, 2, 3, 4, 5, 6]
         w_y8 = []
         w_yall = [w_y0, w_y1, w_y2, w_y3, w_y4, w_y5, w_y6, w_y7, w_y8]
     water = []
@@ -165,21 +165,19 @@ def map_creation(MAX, scene):
 def visual(MAX, scene, ship):
     visual = map_creation(MAX, scene)
     visual[ship.x][ship.y] = "S"
+    MAX -= 1
     if scene == 1 or scene == 2:
-        table = [[visual[x][0] for x in range(MAX)], [visual[x][1] for x in range(MAX)],
-                [visual[x][2] for x in range(MAX)], [visual[x][3] for x in range(MAX)],
-                [visual[x][4] for x in range(MAX)]]
+        table = [[visual[x][1] for x in range(1, MAX)], [visual[x][2] for x in range(1, MAX)],
+                [visual[x][3] for x in range(1, MAX)]]
     if scene == 3:
-        table = [[visual[x][0] for x in range(MAX)], [visual[x][1] for x in range(MAX)],
-                [visual[x][2] for x in range(MAX)], [visual[x][3] for x in range(MAX)],
-                [visual[x][4] for x in range(MAX)], [visual[x][5] for x in range(MAX)]]
+        table = [[visual[x][1] for x in range(1, MAX)], [visual[x][2] for x in range(1, MAX)], 
+                [visual[x][3] for x in range(1, MAX)], [visual[x][4] for x in range(1, MAX)]]
     if scene == 4 or scene == 5:
-        table = [[visual[x][0] for x in range(MAX)], [visual[x][1] for x in range(MAX)],
-                [visual[x][2] for x in range(MAX)], [visual[x][3] for x in range(MAX)],
-                [visual[x][4] for x in range(MAX)], [visual[x][5] for x in range(MAX)],
-                [visual[x][6] for x in range(MAX)], [visual[x][7] for x in range(MAX)],
-                [visual[x][8] for x in range(MAX)]]
-
+        table = [[visual[x][1] for x in range(1, MAX)], [visual[x][2] for x in range(1, MAX)], 
+                [visual[x][3] for x in range(1, MAX)], [visual[x][4] for x in range(1, MAX)], 
+                [visual[x][5] for x in range(1, MAX)], [visual[x][6] for x in range(1, MAX)], 
+                [visual[x][7] for x in range(1, MAX)]]
+    MAX += 1
     print()
     print(tabulate(table, tablefmt="fancy_grid"))
 
@@ -211,7 +209,4 @@ if __name__ == "__main__":
     print("\nScenario 4:")
     S.scenarios(4, 9, T.Ship(0, 6, 1))
     print("\nScenario 5:")
-    S.scenarios(4, 9, T.Ship(0, 5, 5))
-
-    
-
+    S.scenarios(5, 9, T.Ship(0, 5, 5))

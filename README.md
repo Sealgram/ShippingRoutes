@@ -18,7 +18,7 @@ ShippingRoutes/bin/dsharp
 * `scenarios.py`: File that generates the five different working maps, outputs them visually, and places ships on the visually displayed map. 
 
 ## Dependencies
-Install the following for run.py to work:
+Install the following for the project to work:
 ```bash
 pip install tabulate
 ```

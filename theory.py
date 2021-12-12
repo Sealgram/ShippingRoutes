@@ -210,7 +210,7 @@ def theory(time, scene, MAX, start_ship):
             if p.time != 0:
                 ship = ships[p.time][p.x,p.y]
                 prev_p = ports[p.time-1][p.x,p.y]
-                print("if not ", p, " then not ", prev_p, " or ", ship)
+                # print("if not ", p, " then not ", prev_p, " or ", ship)
                 E.add_constraint(~p >> (~prev_p | ship))
 
     #if a port is unfinished, either the next port is also unfished or a ship has just touched the next port
@@ -220,7 +220,7 @@ def theory(time, scene, MAX, start_ship):
                 ship = ships[p.time+1][p.x,p.y]
                 next_p = ports[p.time+1][p.x,p.y]
                 constraint.add_at_most_one(E, next_p, ship)
-                print("if ", p, " then ", next_p, " or ", ship, " but not both")
+                # print("if ", p, " then ", next_p, " or ", ship, " but not both")
                 E.add_constraint(p >> next_p | ship)
 
     #swaps cargo
@@ -231,7 +231,7 @@ def theory(time, scene, MAX, start_ship):
                 ship = ships[p.time][p.x,p.y]
                 curr_cargo = cargo[p.time-1][p.wants_cargo_type]
                 next_cargo = cargo[p.time][p.has_cargo_type]
-                print("if ", ship, " and not ", p, " implies the current cargo is ", curr_cargo, " and the next cargo is ", next_cargo)
+                # print("if ", ship, " and not ", p, " implies the current cargo is ", curr_cargo, " and the next cargo is ", next_cargo)
                 E.add_constraint((ship & ~p) >> (curr_cargo & next_cargo))
 
 
@@ -242,7 +242,7 @@ def theory(time, scene, MAX, start_ship):
                 prev_p = ports[p.time-1][p.x,p.y]
                 curr_cargo = cargo[p.time-1][p.wants_cargo_type]
                 next_cargo = cargo[p.time][p.has_cargo_type]
-                print("if ", prev_p, " and not ", p, " then cargo must have been ", curr_cargo)
+                # print("if ", prev_p, " and not ", p, " then cargo must have been ", curr_cargo)
                 E.add_constraint((~p&prev_p) >> (curr_cargo & next_cargo))
                 # print("if ", prev_p, " and not ", p, " then cargo must currently be ", next_cargo)
                 # E.add_constraint((~p&prev_p) >> next_cargo)
@@ -261,13 +261,13 @@ def theory(time, scene, MAX, start_ship):
 
     for t in ships.values():
         ships_at_t = t.values()
-        print("at most one of ", ships_at_t)
+        # print("at most one of ", ships_at_t)
         constraint.add_exactly_one(E, *ships_at_t)
 
 
     for t in cargo.values():
         cargo_at_t = t.values()
-        print("at most one of ", cargo_at_t)
+        # print("at most one of ", cargo_at_t)
         constraint.add_exactly_one(E, *cargo_at_t)
 
 
@@ -284,7 +284,7 @@ def get_variables(sol, word, time):
                 if word in str(key):
                     if sol.get(key) and key.time == i:
                         var.append(key)
-                        print(key, sol.get(key))
+                        # print(key, sol.get(key))
     return var
 
 
@@ -298,26 +298,3 @@ def solve(time, scene, MAX, ship):
     print("\nSatisfiable: %s" % a_theory.satisfiable())
     print("# Solutions: %d" % count_solutions(a_theory))
     return valids
-
-
-    
-if __name__ == "__main__":
-    time = 3
-    MAX = 3
-    ships = ship_creation(time, MAX)
-    print(ships[2].values())
-    for ship in ships[2].values(): print(ship) if ship.x != 0 else ship
-    print(ships[2].values()) 
-
-    cargo=cargo_creation(time)
-    print(cargo[2].values())
-    for ship in cargo[2].values(): print(ship) if ship.type == "Cars" else ship
-    print(cargo[2].values()) 
-    #S.scenarios(1, 5, Ship(0, 2, 1))
-    #theory = theory(time, 1, 5)
-    #sol = theory.solve()
-    #print_variables(sol, "Ship", True, time)
-    #print_variables(sol, "Cargo", True, time)
-    #print_variables(sol, "Port", True, time)
-    #print("\nSatisfiable: %s" % theory.satisfiable())
-    #print("# Solutions: %d" % count_solutions(theory))

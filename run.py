@@ -64,7 +64,7 @@ def print_solutions(scene, valids):
                 print_progress(scene, ship)
             count += 1
             portcount = 0
-        print("\nIt's journey finished, the shipped dropped anchor.\n\n\n")
+        print("\nIts journey finished, the shipped dropped anchor.\n\n\n")
     else:
         print("\nThe ship's journey could not be completed in the indicated timestep.\n\n\n")
 

@@ -13,8 +13,7 @@ E = Encoding()
 #
 ####################################
 
-# Proposition to initialize the land nodes 
-
+# Proposition to initialize the land tiles
 @proposition(E)
 class Land:
 
@@ -25,6 +24,7 @@ class Land:
     def __repr__(self):
         return f"Land{ self.x, self.y}"
 
+# Proposition to initialize the water tiles
 @proposition(E)
 class Water:
 
@@ -36,6 +36,7 @@ class Water:
         return f"Water{ self.x, self.y}"
 
 
+# Proposition to initialize the ship on the map
 @proposition(E)
 class Ship:
 
@@ -59,7 +60,7 @@ class Cargo:
     def __repr__(self):
         return f"Cargo{self.time, self.type}"
 
-# Proposition to initialize the port nodes
+# Proposition to initialize the port tiles
 @proposition(E)
 class Port:
     
@@ -189,20 +190,6 @@ def theory(time, scene, MAX, start_ship):
                 adj_left = ships[t+1][ship.x-1,ship.y]
                 E.add_constraint(ship >>  adj_up | adj_down | adj_right | adj_left)
 
-    #if a given ship not at time step 0 is true
-    #then there must be an adjacent ship at the previous time step is true 
-    #I wonder if this is useless considiring adjacency might be completley enforced by the previous constraints 
-    #gonna keep it commented out for now
-    # for t in range(1, time+1):
-    #     for key in ships[t]:
-    #         if key.count(0) == 0 and key.count(MAX-1) == 0:
-    #             ship = ships[t][key]
-    #             adj_up = ships[t-1][ship.x,ship.y+1]
-    #             adj_down = ships[t-1][ship.x,ship.y-1]
-    #             adj_right = ships[t-1][ship.x+1,ship.y]
-    #             adj_left = ships[t-1][ship.x-1,ship.y]
-    #             print(adj_up, " ", adj_down, " ", adj_left, " ", adj_right, " are all adjacent to ", ship)
-    #             E.add_constraint(ship >>  adj_up | adj_down | adj_right | adj_left)
 
     #if a port is finished, either the previous port is also finished or a ship has just touched the port
     for t in ports.values():
@@ -245,7 +232,6 @@ def theory(time, scene, MAX, start_ship):
                 # print("if ", prev_p, " and not ", p, " then cargo must have been ", curr_cargo)
                 E.add_constraint((~p&prev_p) >> (curr_cargo & next_cargo))
                 # print("if ", prev_p, " and not ", p, " then cargo must currently be ", next_cargo)
-                # E.add_constraint((~p&prev_p) >> next_cargo)
 
     #if ship is on a water tile then cargo must currently be the same as last cargo
     for w in water:

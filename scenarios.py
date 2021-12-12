@@ -8,6 +8,7 @@ import theory as T
 #
 ####################################
 
+# Function that creates all of the land on the map for each scenario, taking in the scene it is creating land for as a parameter.
 def land_creation(scene):
     if scene == 1:
         l_y0 = []
@@ -53,6 +54,7 @@ def land_creation(scene):
         l_y7 = []
         l_y8 = []
         l_yall = [l_y0, l_y1, l_y2, l_y3, l_y4, l_y5, l_y6, l_y7, l_y8]
+    # the specific scenario's land objects will be stored in a list
     land = []
     # initialize all land on map
     for y in range(len(l_yall)):
@@ -61,6 +63,7 @@ def land_creation(scene):
             land.append(prop)
     return land
 
+# Function that creates all of the water on the map for each scenario, taking in the scene it is creating water for as a parameter.
 def water_creation(scene):
     if scene == 1:
         w_y0 = []
@@ -106,6 +109,7 @@ def water_creation(scene):
         w_y7 = [1, 2, 3, 4, 5, 6]
         w_y8 = []
         w_yall = [w_y0, w_y1, w_y2, w_y3, w_y4, w_y5, w_y6, w_y7, w_y8]
+    # the specific scenarios water objects will be stored in a list
     water = []
     # initialize all water on map
     for y in range(len(w_yall)):
@@ -114,7 +118,9 @@ def water_creation(scene):
             water.append(prop)
     return water
 
+# Function that creates all of the ports on the map for each scenario, taking in the scene it is creating ports for as a parameter.
 def port_creation(scene):
+    # the specific scenario's port objects will be stored in a list
     ports = []
     if scene == 1:
         prop = T.Port(0, 2, 3, "Cars", "Produce")
@@ -145,6 +151,7 @@ def port_creation(scene):
         ports.append(prop)
     return ports
 
+# function that takes in the scene that is being created as a parameter, as well as the maximum size of the map, and generates a list that represents the entire map
 def map_creation(MAX, scene):
     map = [[0 for x in range(MAX)] for y in range(MAX)]
     land = land_creation(scene)
@@ -158,10 +165,9 @@ def map_creation(MAX, scene):
     ports = port_creation(scene)
     for i in range(len(ports)):
         map[ports[i].x][ports[i].y] = "P"
-
-
     return map
 
+# function that prints out a visual representation of the specific scene making use of tabulate
 def visual(MAX, scene, ship):
     visual = map_creation(MAX, scene)
     visual[ship.x][ship.y] = "S"
@@ -181,6 +187,7 @@ def visual(MAX, scene, ship):
     print()
     print(tabulate(table, tablefmt="fancy_grid"))
 
+# function that prints out each specific scenario, using the function 'visual'.
 def scenarios(scene, MAX, ship):
     if scene == 1:
         # MAX must be 5

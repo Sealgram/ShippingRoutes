@@ -1,6 +1,7 @@
 import scenarios as S 
 import theory as T 
 
+# function that creates the ship objects to be placed on each map
 def start_ship(scene):
     ship = T.Ship(0, 0, 0)
     if scene == 1:
@@ -15,7 +16,7 @@ def start_ship(scene):
         ship = T.Ship(0, 5, 5)
     return ship
 
-
+# function that prints each scenario individually, or all of them, based on input. 
 def print_scenarios(pv):
     if pv == 1 or pv == 6:
         print("Scenario 1:")
@@ -33,6 +34,7 @@ def print_scenarios(pv):
         print("\nScenario 5:")
         S.scenarios(5, 9, start_ship(5))
 
+# function that prints the progress of the ship in a scenario based on input
 def print_progress(pv, ship):
     if pv == 1:
         S.scenarios(1, 5, ship)
@@ -45,7 +47,7 @@ def print_progress(pv, ship):
     if pv == 5:
         S.scenarios(5, 9, ship)
 
-
+# function that prints out the voyage of the ship once it is solved by the model
 def print_solutions(scene, valids):
     if valids[0]:
         print("\n\nThe Voyage:")
@@ -69,6 +71,7 @@ def print_solutions(scene, valids):
         print("\nThe ship's journey could not be completed in the indicated timestep.\n\n\n")
 
 
+# The main user interaction for our code
 if __name__ == "__main__":
     print("CISC 204 Modelling Project: Shipping Routes\nAnton Gudonis\nDallin Whitford\nAidan Wolf\nLiam Seagram\n\n")
     print("Here are the five scenarios that we can test:\n")

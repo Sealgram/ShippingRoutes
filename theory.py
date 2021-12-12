@@ -118,6 +118,7 @@ def expand_ports(time, scene):
 
     return ports_dict
 
+# This function is where our model is solved, via interaction with bauhaus. 
 def theory(time, scene, MAX, start_ship):
     ships = ship_creation(MAX, time)
 
@@ -259,8 +260,6 @@ def theory(time, scene, MAX, start_ship):
 
     T = E.compile()
     return T
-
-
 
 def get_variables(sol, word, time):
     var = []

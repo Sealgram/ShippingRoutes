@@ -23,8 +23,5 @@ Install the following for the project to work:
 pip install tabulate
 ```
 ```bash
-pip install pprint
-```
-```bash
 pip install bauhaus
 ```

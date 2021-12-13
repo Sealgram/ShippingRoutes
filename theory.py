@@ -1,6 +1,5 @@
 from bauhaus import Encoding, proposition, constraint, print_theory
 from bauhaus.utils import count_solutions, likelihood
-import pprint
 from tabulate import tabulate
 import scenarios as S
 
@@ -164,9 +163,7 @@ def theory(time, scene, MAX, start_ship):
     for t in range(time):
         for p in ports[t].values():
             prop = ports[t+1][(p.x,p.y)]
-            # print("if not ", p, " then also not ", prop)
             E.add_constraint(~p >> ~prop)
-            # constraint.add_implies_all(E, ~p, ~prop)
 
 
         
@@ -198,7 +195,6 @@ def theory(time, scene, MAX, start_ship):
             if p.time != 0:
                 ship = ships[p.time][p.x,p.y]
                 prev_p = ports[p.time-1][p.x,p.y]
-                # print("if not ", p, " then not ", prev_p, " or ", ship)
                 E.add_constraint(~p >> (~prev_p | ship))
 
     #if a port is unfinished, either the next port is also unfished or a ship has just touched the next port
@@ -208,7 +204,6 @@ def theory(time, scene, MAX, start_ship):
                 ship = ships[p.time+1][p.x,p.y]
                 next_p = ports[p.time+1][p.x,p.y]
                 constraint.add_at_most_one(E, next_p, ship)
-                # print("if ", p, " then ", next_p, " or ", ship, " but not both")
                 E.add_constraint(p >> next_p | ship)
 
     #swaps cargo
@@ -219,20 +214,16 @@ def theory(time, scene, MAX, start_ship):
                 ship = ships[p.time][p.x,p.y]
                 curr_cargo = cargo[p.time-1][p.wants_cargo_type]
                 next_cargo = cargo[p.time][p.has_cargo_type]
-                # print("if ", ship, " and not ", p, " implies the current cargo is ", curr_cargo, " and the next cargo is ", next_cargo)
                 E.add_constraint((ship & ~p) >> (curr_cargo & next_cargo))
 
-
-
+    # If the current port is unfulfilled, and the previous port is fullfilled, then the cargoes must have been the relevant types
     for t in ports.values():
         for p in t.values():
             if p.time != 0:
                 prev_p = ports[p.time-1][p.x,p.y]
                 curr_cargo = cargo[p.time-1][p.wants_cargo_type]
                 next_cargo = cargo[p.time][p.has_cargo_type]
-                # print("if ", prev_p, " and not ", p, " then cargo must have been ", curr_cargo)
                 E.add_constraint((~p&prev_p) >> (curr_cargo & next_cargo))
-                # print("if ", prev_p, " and not ", p, " then cargo must currently be ", next_cargo)
 
     #if ship is on a water tile then cargo must currently be the same as last cargo
     for w in water:
@@ -245,16 +236,14 @@ def theory(time, scene, MAX, start_ship):
                 prev_cargo = cargo[t-1][curr_cargo.type]
                 E.add_constraint((w & ship & prev_cargo) >> (curr_cargo))
 
-
+    # There must be exactly one ship at any given timestep
     for t in ships.values():
         ships_at_t = t.values()
-        # print("at most one of ", ships_at_t)
         constraint.add_exactly_one(E, *ships_at_t)
 
-
+    # There must be exactly one of the three cargo types carried by the ship at any given timestep
     for t in cargo.values():
         cargo_at_t = t.values()
-        # print("at most one of ", cargo_at_t)
         constraint.add_exactly_one(E, *cargo_at_t)
 
 
@@ -269,7 +258,6 @@ def get_variables(sol, word, time):
                 if word in str(key):
                     if sol.get(key) and key.time == i:
                         var.append(key)
-                        # print(key, sol.get(key))
     return var
 
 
